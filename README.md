@@ -68,7 +68,8 @@ The application uses a relational PostgreSQL schema designed for scalability and
 
 ### 5. Testing & Quality Assurance
 - **Unit Testing**: Jest and React Testing Library for component and utility function tests.
-- **Test Coverage**: Critical CMS components (`SectionEditor`), UI components (`Navbar`), and utility functions (`cloudinaryHelper`).
+- **E2E Testing**: Playwright for end-to-end smoke tests across Chromium, Firefox, and WebKit.
+- **Test Coverage**: Critical CMS components (`SectionEditor`), UI components (`Navbar`), utility functions (`cloudinaryHelper`), and core user flows.
 - **Accessibility**: Components include proper ARIA labels and semantic HTML for improved testability and user experience.
 
 ---
@@ -119,6 +120,12 @@ The application uses a relational PostgreSQL schema designed for scalability and
    npm run test:watch
    ```
 
+6. **Run E2E Tests:**
+   ```bash
+   npx playwright test
+   ```
+   Playwright will automatically start the dev server, run smoke tests, and verify critical user flows.
+
 ---
 
 ## 📂 Project Structure
@@ -147,7 +154,7 @@ Based on a production readiness audit, the following improvements are planned:
 
 ### 1. Automated Testing Suite ✅
 - **Unit Testing**: ✅ Implemented `Jest` and `React Testing Library` for utility functions and complex components.
-- **E2E Testing**: Set up `Playwright` or `Cypress` for critical user flows (smoke tests).
+- **E2E Testing**: ✅ Set up `Playwright` with smoke tests for critical user flows (landing page, navigation).
 
 ### 2. CI/CD Pipeline
 - **GitHub Actions**: Establish a pipeline to run linter, type checks, and tests on every Pull Request.
