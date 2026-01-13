@@ -146,8 +146,9 @@ export default function SectionEditor({ section, onSave, onCancel }: SectionEdit
                 <form onSubmit={handleSaveSection} className="space-y-6">
                     <div className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium mb-1">Collection Title</label>
+                            <label htmlFor="title" className="block text-sm font-medium mb-1">Collection Title</label>
                             <input
+                                id="title"
                                 type="text"
                                 value={title}
                                 onChange={e => setTitle(e.target.value)}
@@ -157,8 +158,9 @@ export default function SectionEditor({ section, onSave, onCancel }: SectionEdit
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium mb-1">Description</label>
+                            <label htmlFor="description" className="block text-sm font-medium mb-1">Description</label>
                             <textarea
+                                id="description"
                                 value={description}
                                 onChange={e => setDescription(e.target.value)}
                                 className="w-full bg-black/50 border border-white/10 rounded p-2 h-24"

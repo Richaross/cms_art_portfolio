@@ -11,6 +11,7 @@ A high-performance, dark-themed art portfolio website featuring a custom Content
 - **Icons**: [Lucide React](https://lucide.dev/)
 - **Animations**: [Framer Motion](https://www.framer.com/motion/)
 - **Payments**: Integrated Stripe links for direct purchasing.
+- **Testing**: [Jest](https://jestjs.io/) & [React Testing Library](https://testing-library.com/react)
 
 ---
 
@@ -65,6 +66,11 @@ The application uses a relational PostgreSQL schema designed for scalability and
 - **Row Level Security (RLS)**: Supabase policies enforce that only authenticated users (the Admin) can modify data, while the public has read-only access.
 - **Optimized Rendering**: Utilizing Next.js Image optimization and Framer Motion for 60fps animations and transitions.
 
+### 5. Testing & Quality Assurance
+- **Unit Testing**: Jest and React Testing Library for component and utility function tests.
+- **Test Coverage**: Critical CMS components (`SectionEditor`), UI components (`Navbar`), and utility functions (`cloudinaryHelper`).
+- **Accessibility**: Components include proper ARIA labels and semantic HTML for improved testability and user experience.
+
 ---
 
 ## 🚀 Getting Started
@@ -104,6 +110,15 @@ The application uses a relational PostgreSQL schema designed for scalability and
    ```
    Open [http://localhost:3000](http://localhost:3000) to view the application.
 
+5. **Run Tests:**
+   ```bash
+   npm run test
+   ```
+   Or run in watch mode during development:
+   ```bash
+   npm run test:watch
+   ```
+
 ---
 
 ## 📂 Project Structure
@@ -130,8 +145,8 @@ app/
 
 Based on a production readiness audit, the following improvements are planned:
 
-### 1. Automated Testing Suite
-- **Unit Testing**: Implement `Jest` and `React Testing Library` for utility functions and complex components.
+### 1. Automated Testing Suite ✅
+- **Unit Testing**: ✅ Implemented `Jest` and `React Testing Library` for utility functions and complex components.
 - **E2E Testing**: Set up `Playwright` or `Cypress` for critical user flows (smoke tests).
 
 ### 2. CI/CD Pipeline

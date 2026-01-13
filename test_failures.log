@@ -1,0 +1,446 @@
+
+> app@0.1.0 test
+> jest SectionEditor
+
+FAIL components/cms/__tests__/SectionEditor.test.tsx
+  SectionEditor Component
+    × renders "New Collection" mode when section prop is null (50 ms)
+    √ renders "Edit Collection" mode with existing data (14 ms)
+    × calls saveSection with correct data on form submission (100 ms)
+    × handles save error gracefully (33 ms)
+    √ requests confirmation before deleting (18 ms)
+    √ renders Items tab only when section exists (12 ms)
+    √ switches to Items tab and displays content (12 ms)
+
+  ● SectionEditor Component › renders "New Collection" mode when section prop is null
+
+    TestingLibraryElementError: Found multiple elements with the display value: .
+
+    Here are the matching elements:
+
+    Ignored nodes: comments, script, style
+    [36m<input[39m
+      [33mclass[39m=[32m"w-full bg-black/50 border border-white/10 rounded p-2"[39m
+      [33mrequired[39m=[32m""[39m
+      [33mtype[39m=[32m"text"[39m
+      [33mvalue[39m=[32m""[39m
+    [36m/>[39m
+
+    Ignored nodes: comments, script, style
+    [36m<textarea[39m
+      [33mclass[39m=[32m"w-full bg-black/50 border border-white/10 rounded p-2 h-24"[39m
+    [36m/>[39m
+
+    Ignored nodes: comments, script, style
+    [36m<input[39m
+      [33mdata-testid[39m=[32m"image-input"[39m
+      [33mvalue[39m=[32m""[39m
+    [36m/>[39m
+
+    (If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).
+
+    Ignored nodes: comments, script, style
+    [36m<body>[39m
+      [36m<div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-neutral-900 border border-white/10 p-6 rounded-lg"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-between items-center mb-6"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mclass[39m=[32m"text-xl font-bold"[39m
+            [36m>[39m
+              [0mNew Collection[0m
+            [36m</h2>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"space-x-4"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"text-xs text-yellow-500"[39m
+              [36m>[39m
+                [0mSave collection to add items[0m
+              [36m</span>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"text-sm text-gray-400 hover:text-white"[39m
+              [36m>[39m
+                [0mClose[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<form[39m
+            [33mclass[39m=[32m"space-y-6"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"space-y-4"[39m
+            [36m>[39m
+              [36m<div>[39m
+                [36m<label[39m
+                  [33mclass[39m=[32m"block text-sm font-medium mb-1"[39m
+                [36m>[39m
+                  [0mCollection Title[0m
+                [36m</label>[39m
+                [36m<input[39m
+                  [33mclass[39m=[32m"w-full bg-black/50 border border-white/10 rounded p-2"[39m
+                  [33mrequired[39m=[32m""[39m
+                  [33mtype[39m=[32m"text"[39m
+                  [33mvalue[39m=[32m""[39m
+                [36m/>[39m
+              [36m</div>[39m
+              [36m<div>[39m
+                [36m<label[39m
+                  [33mclass[39m=[32m"block text-sm font-medium mb-1"[39m
+                [36m>[39m
+                  [0mDescription[0m
+                [36m</label>[39m
+                [36m<textarea[39m
+                  [33mclass[39m=[32m"w-full bg-black/50 border border-white/10 rounded p-2 h-24"[39m
+                [36m/>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mdata-testid[39m=[32m"image-uploader"[39m
+              [36m>[39m
+                [36m<label>[39m
+                  [0mCover Image[0m
+                [36m</label>[39m
+                [36m<input[39m
+                  [33mdata-testid[39m=[32m"image-input"[39m
+                  [33mvalue[39m=[32m""[39m
+                [36m/>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex items-center justify-between pt-4 border-t border-white/10"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"bg-white text-black font-bold px-6 py-2 rounded hover:bg-gray-200 disabled:opacity-50 ml-auto"[39m
+                [33mtype[39m=[32m"submit"[39m
+              [36m>[39m
+                [0mSave Collection[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</form>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</body>[39m
+
+    [0m [90m 67 |[39m
+     [90m 68 |[39m         expect(screen[33m.[39mgetByText([32m'New Collection'[39m))[33m.[39mtoBeInTheDocument()[33m;[39m
+    [31m[1m>[22m[39m[90m 69 |[39m         expect(screen[33m.[39mgetByDisplayValue([32m''[39m))[33m.[39mtoBeInTheDocument()[33m;[39m [90m// Empty title[39m
+     [90m    |[39m                       [31m[1m^[22m[39m
+     [90m 70 |[39m     })[33m;[39m
+     [90m 71 |[39m
+     [90m 72 |[39m     it([32m'renders "Edit Collection" mode with existing data'[39m[33m,[39m () [33m=>[39m {[0m
+
+      at Object.getElementError (node_modules/@testing-library/dom/dist/config.js:37:19)
+      at getElementError (node_modules/@testing-library/dom/dist/query-helpers.js:20:35)
+      at getMultipleElementsFoundError (node_modules/@testing-library/dom/dist/query-helpers.js:23:10)
+      at node_modules/@testing-library/dom/dist/query-helpers.js:55:13
+      at node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+      at Object.getByDisplayValue (components/cms/__tests__/SectionEditor.test.tsx:69:23)
+
+  ● SectionEditor Component › calls saveSection with correct data on form submission
+
+    TestingLibraryElementError: Unable to find an accessible element with the role "textbox" and name `/collection title/i`
+
+    Here are the accessible roles:
+
+      heading:
+
+      Name "New Collection":
+      [36m<h2[39m
+        [33mclass[39m=[32m"text-xl font-bold"[39m
+      [36m/>[39m
+
+      --------------------------------------------------
+      button:
+
+      Name "Close":
+      [36m<button[39m
+        [33mclass[39m=[32m"text-sm text-gray-400 hover:text-white"[39m
+      [36m/>[39m
+
+      Name "Save Collection":
+      [36m<button[39m
+        [33mclass[39m=[32m"bg-white text-black font-bold px-6 py-2 rounded hover:bg-gray-200 disabled:opacity-50 ml-auto"[39m
+        [33mtype[39m=[32m"submit"[39m
+      [36m/>[39m
+
+      --------------------------------------------------
+      textbox:
+
+      Name "":
+      [36m<input[39m
+        [33mclass[39m=[32m"w-full bg-black/50 border border-white/10 rounded p-2"[39m
+        [33mrequired[39m=[32m""[39m
+        [33mtype[39m=[32m"text"[39m
+        [33mvalue[39m=[32m""[39m
+      [36m/>[39m
+
+      Name "":
+      [36m<textarea[39m
+        [33mclass[39m=[32m"w-full bg-black/50 border border-white/10 rounded p-2 h-24"[39m
+      [36m/>[39m
+
+      Name "":
+      [36m<input[39m
+        [33mdata-testid[39m=[32m"image-input"[39m
+        [33mvalue[39m=[32m""[39m
+      [36m/>[39m
+
+      --------------------------------------------------
+
+    Ignored nodes: comments, script, style
+    [36m<body>[39m
+      [36m<div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-neutral-900 border border-white/10 p-6 rounded-lg"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-between items-center mb-6"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mclass[39m=[32m"text-xl font-bold"[39m
+            [36m>[39m
+              [0mNew Collection[0m
+            [36m</h2>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"space-x-4"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"text-xs text-yellow-500"[39m
+              [36m>[39m
+                [0mSave collection to add items[0m
+              [36m</span>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"text-sm text-gray-400 hover:text-white"[39m
+              [36m>[39m
+                [0mClose[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<form[39m
+            [33mclass[39m=[32m"space-y-6"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"space-y-4"[39m
+            [36m>[39m
+              [36m<div>[39m
+                [36m<label[39m
+                  [33mclass[39m=[32m"block text-sm font-medium mb-1"[39m
+                [36m>[39m
+                  [0mCollection Title[0m
+                [36m</label>[39m
+                [36m<input[39m
+                  [33mclass[39m=[32m"w-full bg-black/50 border border-white/10 rounded p-2"[39m
+                  [33mrequired[39m=[32m""[39m
+                  [33mtype[39m=[32m"text"[39m
+                  [33mvalue[39m=[32m""[39m
+                [36m/>[39m
+              [36m</div>[39m
+              [36m<div>[39m
+                [36m<label[39m
+                  [33mclass[39m=[32m"block text-sm font-medium mb-1"[39m
+                [36m>[39m
+                  [0mDescription[0m
+                [36m</label>[39m
+                [36m<textarea[39m
+                  [33mclass[39m=[32m"w-full bg-black/50 border border-white/10 rounded p-2 h-24"[39m
+                [36m/>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mdata-testid[39m=[32m"image-uploader"[39m
+              [36m>[39m
+                [36m<label>[39m
+                  [0mCover Image[0m
+                [36m</label>[39m
+                [36m<input[39m
+                  [33mdata-testid[39m=[32m"image-input"[39m
+                  [33mvalue[39m=[32m""[39m
+                [36m/>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex items-center justify-between pt-4 border-t border-white/10"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"bg-white text-black font-bold px-6 py-2 rounded hover:bg-gray-200 disabled:opacity-50 ml-auto"[39m
+                [33mtype[39m=[32m"submit"[39m
+              [36m>[39m
+                [0mSave Collection[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</form>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</body>[39m
+
+    [0m [90m 85 |[39m
+     [90m 86 |[39m         [90m// Fill out form[39m
+    [31m[1m>[22m[39m[90m 87 |[39m         fireEvent[33m.[39mchange(screen[33m.[39mgetByRole([32m'textbox'[39m[33m,[39m { name[33m:[39m [35m/collection title/i[39m })[33m,[39m {
+     [90m    |[39m                                 [31m[1m^[22m[39m
+     [90m 88 |[39m             target[33m:[39m { value[33m:[39m [32m'New Masterpiece'[39m }
+     [90m 89 |[39m         })[33m;[39m
+     [90m 90 |[39m         fireEvent[33m.[39mchange(screen[33m.[39mgetByRole([32m'textbox'[39m[33m,[39m { name[33m:[39m [35m/description/i[39m })[33m,[39m {[0m
+
+      at Object.getElementError (node_modules/@testing-library/dom/dist/config.js:37:19)
+      at node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+      at node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+      at node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+      at Object.getByRole (components/cms/__tests__/SectionEditor.test.tsx:87:33)
+
+  ● SectionEditor Component › handles save error gracefully
+
+    TestingLibraryElementError: Unable to find an accessible element with the role "textbox" and name `/collection title/i`
+
+    Here are the accessible roles:
+
+      heading:
+
+      Name "New Collection":
+      [36m<h2[39m
+        [33mclass[39m=[32m"text-xl font-bold"[39m
+      [36m/>[39m
+
+      --------------------------------------------------
+      button:
+
+      Name "Close":
+      [36m<button[39m
+        [33mclass[39m=[32m"text-sm text-gray-400 hover:text-white"[39m
+      [36m/>[39m
+
+      Name "Save Collection":
+      [36m<button[39m
+        [33mclass[39m=[32m"bg-white text-black font-bold px-6 py-2 rounded hover:bg-gray-200 disabled:opacity-50 ml-auto"[39m
+        [33mtype[39m=[32m"submit"[39m
+      [36m/>[39m
+
+      --------------------------------------------------
+      textbox:
+
+      Name "":
+      [36m<input[39m
+        [33mclass[39m=[32m"w-full bg-black/50 border border-white/10 rounded p-2"[39m
+        [33mrequired[39m=[32m""[39m
+        [33mtype[39m=[32m"text"[39m
+        [33mvalue[39m=[32m""[39m
+      [36m/>[39m
+
+      Name "":
+      [36m<textarea[39m
+        [33mclass[39m=[32m"w-full bg-black/50 border border-white/10 rounded p-2 h-24"[39m
+      [36m/>[39m
+
+      Name "":
+      [36m<input[39m
+        [33mdata-testid[39m=[32m"image-input"[39m
+        [33mvalue[39m=[32m""[39m
+      [36m/>[39m
+
+      --------------------------------------------------
+
+    Ignored nodes: comments, script, style
+    [36m<body>[39m
+      [36m<div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-neutral-900 border border-white/10 p-6 rounded-lg"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-between items-center mb-6"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mclass[39m=[32m"text-xl font-bold"[39m
+            [36m>[39m
+              [0mNew Collection[0m
+            [36m</h2>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"space-x-4"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"text-xs text-yellow-500"[39m
+              [36m>[39m
+                [0mSave collection to add items[0m
+              [36m</span>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"text-sm text-gray-400 hover:text-white"[39m
+              [36m>[39m
+                [0mClose[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<form[39m
+            [33mclass[39m=[32m"space-y-6"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"space-y-4"[39m
+            [36m>[39m
+              [36m<div>[39m
+                [36m<label[39m
+                  [33mclass[39m=[32m"block text-sm font-medium mb-1"[39m
+                [36m>[39m
+                  [0mCollection Title[0m
+                [36m</label>[39m
+                [36m<input[39m
+                  [33mclass[39m=[32m"w-full bg-black/50 border border-white/10 rounded p-2"[39m
+                  [33mrequired[39m=[32m""[39m
+                  [33mtype[39m=[32m"text"[39m
+                  [33mvalue[39m=[32m""[39m
+                [36m/>[39m
+              [36m</div>[39m
+              [36m<div>[39m
+                [36m<label[39m
+                  [33mclass[39m=[32m"block text-sm font-medium mb-1"[39m
+                [36m>[39m
+                  [0mDescription[0m
+                [36m</label>[39m
+                [36m<textarea[39m
+                  [33mclass[39m=[32m"w-full bg-black/50 border border-white/10 rounded p-2 h-24"[39m
+                [36m/>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mdata-testid[39m=[32m"image-uploader"[39m
+              [36m>[39m
+                [36m<label>[39m
+                  [0mCover Image[0m
+                [36m</label>[39m
+                [36m<input[39m
+                  [33mdata-testid[39m=[32m"image-input"[39m
+                  [33mvalue[39m=[32m""[39m
+                [36m/>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex items-center justify-between pt-4 border-t border-white/10"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"bg-white text-black font-bold px-6 py-2 rounded hover:bg-gray-200 disabled:opacity-50 ml-auto"[39m
+                [33mtype[39m=[32m"submit"[39m
+              [36m>[39m
+                [0mSave Collection[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</form>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</body>[39m
+
+    [0m [90m 116 |[39m
+     [90m 117 |[39m         [90m// Fill minimum required title (assuming 'required' attribute on input)[39m
+    [31m[1m>[22m[39m[90m 118 |[39m         fireEvent[33m.[39mchange(screen[33m.[39mgetByRole([32m'textbox'[39m[33m,[39m { name[33m:[39m [35m/collection title/i[39m })[33m,[39m { target[33m:[39m { value[33m:[39m [32m'Fail Test'[39m } })[33m;[39m
+     [90m     |[39m                                 [31m[1m^[22m[39m
+     [90m 119 |[39m
+     [90m 120 |[39m         fireEvent[33m.[39mclick(screen[33m.[39mgetByRole([32m'button'[39m[33m,[39m { name[33m:[39m [35m/save collection/i[39m }))[33m;[39m
+     [90m 121 |[39m[0m
+
+      at Object.getElementError (node_modules/@testing-library/dom/dist/config.js:37:19)
+      at node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+      at node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+      at node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+      at Object.getByRole (components/cms/__tests__/SectionEditor.test.tsx:118:33)
+
+Test Suites: 1 failed, 1 total
+Tests:       3 failed, 4 passed, 7 total
+Snapshots:   0 total
+Time:        2.008 s
+Ran all test suites matching SectionEditor.

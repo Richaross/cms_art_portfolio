@@ -1,0 +1,25 @@
+
+> app@0.1.0 test
+> jest SectionEditor
+
+FAIL components/cms/__tests__/SectionEditor.test.tsx
+  ● Test suite failed to run
+
+    Cannot find module '@/app/actions/portfolio' from 'components/cms/__tests__/SectionEditor.test.tsx'
+
+    [0m [90m  7 |[39m
+     [90m  8 |[39m [90m// Mock Server Actions[39m
+    [31m[1m>[22m[39m[90m  9 |[39m jest[33m.[39mmock([32m'@/app/actions/portfolio'[39m[33m,[39m () [33m=>[39m ({
+     [90m    |[39m      [31m[1m^[22m[39m
+     [90m 10 |[39m     saveSection[33m:[39m jest[33m.[39mfn()[33m,[39m
+     [90m 11 |[39m     deleteSection[33m:[39m jest[33m.[39mfn()[33m,[39m
+     [90m 12 |[39m }))[33m;[39m[0m
+
+      at Resolver._throwModNotFoundError (node_modules/jest-resolve/build/index.js:863:11)
+      at Object.mock (components/cms/__tests__/SectionEditor.test.tsx:9:6)
+
+Test Suites: 1 failed, 1 total
+Tests:       0 total
+Snapshots:   0 total
+Time:        1.457 s
+Ran all test suites matching SectionEditor.
