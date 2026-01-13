@@ -123,3 +123,29 @@ app/
 ├── lib/               # Shared utilities (Supabase client, Services)
 └── types/             # Database type definitions
 ```
+
+---
+
+## 🔮 Future Updates & Roadmap
+
+Based on a production readiness audit, the following improvements are planned:
+
+### 1. Automated Testing Suite
+- **Unit Testing**: Implement `Jest` and `React Testing Library` for utility functions and complex components.
+- **E2E Testing**: Set up `Playwright` or `Cypress` for critical user flows (smoke tests).
+
+### 2. CI/CD Pipeline
+- **GitHub Actions**: Establish a pipeline to run linter, type checks, and tests on every Pull Request.
+- **Build Checks**: Ensure the application compiles successfully before merging.
+
+### 3. Code Quality & Standards
+- **Prettier**: Enforce consistent code formatting.
+- **Husky & Lint-Staged**: Run quality checks (linting/formatting) automatically on git commits.
+
+### 4. Monitoring & performance
+- **Error Logging**: Integrate Sentry for real-time error tracking in production.
+- **Performance**: Implement bundle analysis and strictly validate environment variables.
+
+### 5. Security Hardening
+- **CSP**: Configure Content Security Policy headers.
+- **Env Validation**: Use `zod` to validate all environment variables at build time.
