@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
-import { Database } from '@/types/database';
 import { motion } from 'framer-motion';
 import { LogOut, LayoutGrid, User, Newspaper, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
@@ -13,9 +12,7 @@ import SectionEditor from '@/components/cms/SectionEditor';
 import AboutEditor from '@/components/cms/AboutEditor';
 import NewsEditor from '@/components/cms/NewsEditor';
 
-type Section = Database['public']['Tables']['sections']['Row'] & {
-  inventory: Database['public']['Tables']['inventory']['Row'] | null
-};
+import { PortfolioSection } from '@/app/domain/types';
 
 // Tabs Config
 const TABS = [
@@ -28,19 +25,15 @@ type TabId = typeof TABS[number]['id'];
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<TabId>('portfolio');
-  const [sections, setSections] = useState<Section[]>([]);
-  const [editingSection, setEditingSection] = useState<Section | null | undefined>(undefined);
+  const [sections, setSections] = useState<PortfolioSection[]>([]);
+  const [editingSection, setEditingSection] = useState<PortfolioSection | null | undefined>(undefined);
 
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const supabase = createClient();
+  const [supabase] = useState(() => createClient());
 
   // 1. Auth Check & Data Fetch
   const fetchData = useCallback(async () => {
-    // Only fetch portfolio data if we are on that tab, theoretically. 
-    // But for simplicity we can fetch it when needed or eagerly.
-    // Let's keep existing logic to fetch portfolio data on mount/refresh if tab is portfolio.
-
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
       router.push('/login');
@@ -48,19 +41,37 @@ export default function DashboardPage() {
     }
 
     if (activeTab === 'portfolio') {
-      const { data, error } = await supabase
+      const { data: sectionsData, error } = await supabase
         .from('sections')
         .select('*, inventory(*)')
         .order('order_rank', { ascending: true });
 
       if (error) console.error('Error fetching sections:', error);
-      else setSections(data as Section[]);
+      else {
+        // Map database result to PortfolioSection
+        const mapped: PortfolioSection[] = (sectionsData || []).map(s => ({
+          id: s.id,
+          title: s.title,
+          description: s.description,
+          imgUrl: s.img_url,
+          orderRank: s.order_rank,
+          inventory: s.inventory?.[0] ? {
+            sectionId: s.inventory[0].section_id,
+            stockQty: s.inventory[0].stock_qty,
+            price: s.inventory[0].price,
+            stripeLink: s.inventory[0].stripe_link,
+            isSaleActive: s.inventory[0].is_sale_active
+          } : null
+        }));
+        setSections(mapped);
+      }
     }
 
     setLoading(false);
   }, [activeTab, router, supabase]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchData();
   }, [fetchData]);
 

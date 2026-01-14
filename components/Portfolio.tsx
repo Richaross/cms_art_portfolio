@@ -87,11 +87,14 @@ export default function Portfolio() {
                             {/* Collection Cover Image */}
                             <div className="relative overflow-hidden rounded-lg bg-neutral-900 mb-4 aspect-[4/5]">
                                 {section.img_url ? (
-                                    <img
-                                        src={section.img_url}
-                                        alt={section.title || 'Collection'}
-                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                    />
+                                    <>
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img
+                                            src={section.img_url}
+                                            alt={section.title || 'Collection'}
+                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                        />
+                                    </>
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center text-gray-700">No Cover</div>
                                 )}
@@ -157,11 +160,14 @@ export default function Portfolio() {
                                             {/* Item Image */}
                                             <div className="aspect-square bg-neutral-800 relative">
                                                 {item.image_url ? (
-                                                    <img
-                                                        src={item.image_url}
-                                                        alt={item.title || 'Item'}
-                                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                                    />
+                                                    <>
+                                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                        <img
+                                                            src={item.image_url}
+                                                            alt={item.title || 'Item'}
+                                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                                        />
+                                                    </>
                                                 ) : (
                                                     <div className="w-full h-full flex items-center justify-center text-gray-600">No Image</div>
                                                 )}
@@ -189,8 +195,8 @@ export default function Portfolio() {
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 className={`px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider flex items-center gap-1 ${item.stripe_link
-                                                                        ? 'bg-white text-black hover:bg-gray-200'
-                                                                        : 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                                                                    ? 'bg-white text-black hover:bg-gray-200'
+                                                                    : 'bg-gray-700 text-gray-400 cursor-not-allowed'
                                                                     }`}
                                                             >
                                                                 <ShoppingBag size={12} /> Buy

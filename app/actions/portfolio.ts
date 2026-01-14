@@ -26,9 +26,9 @@ export async function saveSection(section: Partial<PortfolioSection>, inventory?
         revalidatePath('/dashboard');
         revalidatePath('/');
         return { success: true };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Failed to save section:', error);
-        return { success: false, error: error.message };
+        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
 }
 
@@ -43,9 +43,9 @@ export async function deleteSection(id: string, imgUrl?: string | null): Promise
         revalidatePath('/dashboard');
         revalidatePath('/');
         return { success: true };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Failed to delete section:', error);
-        return { success: false, error: error.message };
+        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
 }
 
@@ -58,9 +58,9 @@ export async function saveItem(item: SectionItem): Promise<{ success: boolean; e
         revalidatePath('/dashboard');
         revalidatePath('/');
         return { success: true };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Failed to save item:', error);
-        return { success: false, error: error.message };
+        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
 }
 
@@ -75,8 +75,8 @@ export async function deleteItem(id: string, imgUrl?: string | null): Promise<{ 
         revalidatePath('/dashboard');
         revalidatePath('/');
         return { success: true };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Failed to delete item:', error);
-        return { success: false, error: error.message };
+        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
 }

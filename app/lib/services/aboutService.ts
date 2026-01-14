@@ -11,10 +11,12 @@ export class AboutService {
 
         if (error || !data) return null;
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const result = data as any;
         return {
-            id: data.id,
-            description: data.description,
-            portraitUrl: data.portrait_url,
+            id: result.id,
+            description: result.description,
+            portraitUrl: result.portrait_url,
         };
     }
 
@@ -25,7 +27,8 @@ export class AboutService {
             portrait_url: info.portraitUrl,
         };
 
-        const { error } = await supabase.from('about_info').upsert(dbRow);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error } = await supabase.from('about_info').upsert(dbRow as any);
         if (error) throw error;
     }
 }

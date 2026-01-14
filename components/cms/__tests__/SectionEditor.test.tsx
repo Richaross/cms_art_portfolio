@@ -13,7 +13,7 @@ jest.mock('../../../app/actions/portfolio', () => ({
 
 // Mock Child Components
 jest.mock('../ImageUploader', () => {
-    return function MockImageUploader({ value, onChange, label }: any) {
+    return function MockImageUploader({ value, onChange, label }: { value: string, onChange: (val: string) => void, label: string }) {
         return (
             <div data-testid="image-uploader">
                 <label>{label}</label>
@@ -28,7 +28,7 @@ jest.mock('../ImageUploader', () => {
 });
 
 jest.mock('../ItemEditor', () => {
-    return function MockItemEditor({ onCancel }: any) {
+    return function MockItemEditor({ onCancel }: { onCancel: () => void }) {
         return (
             <div data-testid="item-editor">
                 Mock Item Editor

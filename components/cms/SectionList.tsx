@@ -1,14 +1,10 @@
 'use client'
 
-import { Database } from '@/types/database';
-
-type Section = Database['public']['Tables']['sections']['Row'] & {
-    inventory: Database['public']['Tables']['inventory']['Row'] | null
-};
+import { PortfolioSection } from '@/app/domain/types';
 
 interface SectionListProps {
-    sections: Section[];
-    onEdit: (section: Section) => void;
+    sections: PortfolioSection[];
+    onEdit: (section: PortfolioSection) => void;
     onRefresh: () => void;
 }
 
@@ -25,19 +21,15 @@ export default function SectionList({ sections, onEdit }: SectionListProps) {
                     className="border border-white/10 rounded-lg p-4 bg-neutral-900 cursor-pointer hover:border-white/30 transition-colors"
                     onClick={() => onEdit(section)}
                 >
-                    {section.img_url && (
+                    {section.imgUrl && (
                         <div className="aspect-video w-full mb-4 bg-gray-800 rounded overflow-hidden">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={section.img_url} alt={section.title || 'Artwork'} className="w-full h-full object-cover" />
+                            <img src={section.imgUrl} alt={section.title || 'Artwork'} className="w-full h-full object-cover" />
                         </div>
                     )}
                     <h3 className="font-bold text-lg text-white">{section.title || 'Untitled'}</h3>
-                    <div
-                        className="w-full h-2 mt-2 rounded"
-                        style={{ backgroundColor: section.bg_color || '#333' }}
-                    />
                     <div className="mt-2 text-xs text-gray-400">
-                        {section.inventory?.is_sale_active ? (
+                        {section.inventory?.isSaleActive ? (
                             <span className="text-green-400 font-bold">SALE ACTIVE (${section.inventory.price})</span>
                         ) : (
                             <span>Not for sale</span>

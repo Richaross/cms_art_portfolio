@@ -36,7 +36,8 @@ export default function AboutEditor() {
 
     return (
         <div className="bg-neutral-900 border border-white/10 p-6 rounded-lg max-w-2xl">
-            <h2 className="text-xl font-bold mb-6">Edit "About" Section</h2>
+            <h2 className="text-xl font-bold mb-6">Edit &quot;About&quot; Section</h2>
+            <p className="tex-sm text-gray-400">Manage the content for the &quot;About&quot; section.</p>
             <form onSubmit={handleSave} className="space-y-6">
                 <div>
                     <label className="block text-sm font-medium mb-1">Artist Bio (Rich Text)</label>

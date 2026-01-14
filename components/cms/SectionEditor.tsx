@@ -5,7 +5,7 @@ import { PortfolioSection, SectionItem } from '@/app/domain/types';
 import ImageUploader from './ImageUploader';
 import ItemEditor from './ItemEditor';
 import { saveSection, deleteSection } from '@/app/actions/portfolio';
-import { Plus, Edit2, Archive, GripVertical } from 'lucide-react'; // Assuming lucide-react is available
+import { Plus, Edit2, GripVertical } from 'lucide-react'; // Assuming lucide-react is available
 
 interface SectionEditorProps {
     section: PortfolioSection | null;
@@ -213,7 +213,10 @@ export default function SectionEditor({ section, onSave, onCancel }: SectionEdit
                                     {/* Image Area */}
                                     <div className="aspect-square w-full bg-neutral-800 relative">
                                         {item.imageUrl ? (
-                                            <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
+                                            <>
+                                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
+                                            </>
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center text-xs text-gray-500">No Image</div>
                                         )}
@@ -251,7 +254,7 @@ export default function SectionEditor({ section, onSave, onCancel }: SectionEdit
                             ))
                         ) : (
                             <div className="col-span-full text-center py-12 text-gray-500 italic border-2 border-dashed border-white/10 rounded">
-                                No items in this collection yet. Click "Add Item" to start.
+                                <p>No sections found. Click &quot;Add New Collection&quot; to create one.</p>
                             </div>
                         )}
                     </div>

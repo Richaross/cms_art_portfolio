@@ -19,7 +19,7 @@ describe('cloudinaryHelper', () => {
 
         it('returns null for empty or invalid input', () => {
             expect(getPublicIdFromUrl('')).toBeNull();
-            // @ts-ignore
+            // @ts-expect-error Testing invalid input
             expect(getPublicIdFromUrl(null)).toBeNull();
         });
 

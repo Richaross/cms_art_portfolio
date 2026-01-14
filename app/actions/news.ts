@@ -18,9 +18,9 @@ export async function saveNewsPost(post: Partial<NewsPost>): Promise<{ success: 
         revalidatePath('/dashboard');
         revalidatePath('/'); // Revalidate main page/news section
         return { success: true };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Failed to save news post:', error);
-        return { success: false, error: error.message };
+        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
 }
 
@@ -38,8 +38,8 @@ export async function deleteNewsPost(id: string, imageUrl?: string | null): Prom
         revalidatePath('/dashboard');
         revalidatePath('/');
         return { success: true };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Failed to delete news post:', error);
-        return { success: false, error: error.message };
+        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
 }

@@ -1,11 +1,9 @@
-import { createClient } from '@/lib/supabase/client'; // Reuse existing client config or server client
 // NOTE: For Server Actions, we should use a Server Client usually, 
 // but sticking to the existing pattern for now, we will adapt to server-side usage in actions.
 // Actually, this service is intended to be used *inside* server actions, so it should probably take a client or create a server client.
 // However, 'createClient' in `lib/supabase/client` implies browser usage.
 // We'll assume this service runs on server and uses the server-side supabase client if passed, or we'll abstract it.
 
-import { createClient as createServerClient } from '@supabase/supabase-js';
 // To keep it simple and strictly separating concerns, let's inject the client or use a strictly server-side creation if needed.
 // But mostly we typically use `createServerComponentClient` or similar in Next.js.
 // For now, let's make these functions accept a SupabaseClient to remain stateless, 
@@ -50,7 +48,8 @@ export class NewsService {
             updated_at: new Date().toISOString()
         };
 
-        const { error } = await supabase.from('news_posts').upsert(dbRow);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error } = await supabase.from('news_posts').upsert(dbRow as any);
         if (error) throw error;
     }
 

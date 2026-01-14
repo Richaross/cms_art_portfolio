@@ -17,8 +17,8 @@ export async function saveAboutInfo(info: Partial<AboutInfo>): Promise<{ success
         revalidatePath('/dashboard');
         revalidatePath('/');
         return { success: true };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Failed to save about info:', error);
-        return { success: false, error: error.message };
+        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
 }

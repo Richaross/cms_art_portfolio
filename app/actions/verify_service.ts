@@ -55,8 +55,9 @@ export async function verifyPortfolioService() {
         await PortfolioService.delete(supabase, section.id);
         log('Cleanup Complete');
 
-    } catch (e: any) {
-        log(`❌ Error: ${e.message}`);
+    } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : 'Unknown error';
+        log(`❌ Error: ${msg}`);
     }
 
     return logs;

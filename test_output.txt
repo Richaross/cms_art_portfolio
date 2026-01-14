@@ -1,25 +1,58 @@
 
 > app@0.1.0 test
-> jest SectionEditor
+> jest
 
-FAIL components/cms/__tests__/SectionEditor.test.tsx
+PASS lib/__tests__/cloudinaryHelper.test.ts
+PASS components/__tests__/Navbar.test.tsx
+PASS components/cms/__tests__/SectionEditor.test.tsx
+FAIL e2e/smoke.spec.ts
   ● Test suite failed to run
 
-    Cannot find module '@/app/actions/portfolio' from 'components/cms/__tests__/SectionEditor.test.tsx'
+    ReferenceError: TransformStream is not defined
 
-    [0m [90m  7 |[39m
-     [90m  8 |[39m [90m// Mock Server Actions[39m
-    [31m[1m>[22m[39m[90m  9 |[39m jest[33m.[39mmock([32m'@/app/actions/portfolio'[39m[33m,[39m () [33m=>[39m ({
-     [90m    |[39m      [31m[1m^[22m[39m
-     [90m 10 |[39m     saveSection[33m:[39m jest[33m.[39mfn()[33m,[39m
-     [90m 11 |[39m     deleteSection[33m:[39m jest[33m.[39mfn()[33m,[39m
-     [90m 12 |[39m }))[33m;[39m[0m
+    [0m [90m 3 |[39m test([32m'landing page loads and displays portfolio grid'[39m[33m,[39m [36masync[39m ({ page }) [33m=>[39m {
+     [90m 4 |[39m     [90m// 1. Visit the home page[39m
+    [31m[1m>[22m[39m[90m 5 |[39m     [36mawait[39m page[33m.[39mgoto([32m'http://localhost:3000'[39m)[33m;[39m
+     [90m   |[39m               [31m[1m^[22m[39m
+     [90m 6 |[39m
+     [90m 7 |[39m     [90m// 2. Check for the main title or logo[39m
+     [90m 8 |[39m     [36mawait[39m expect(page[33m.[39mgetByText([32m'ArtPortfolio'[39m))[33m.[39mtoBeVisible()[33m;[39m[0m
 
-      at Resolver._throwModNotFoundError (node_modules/jest-resolve/build/index.js:863:11)
-      at Object.mock (components/cms/__tests__/SectionEditor.test.tsx:9:6)
+      at Object.<anonymous> (node_modules/playwright/lib/mcpBundleImpl.js:17:5390)
+      at Object.<anonymous> (node_modules/playwright/lib/mcp/sdk/bundle.js:48:22)
+      at Object.<anonymous> (node_modules/playwright/lib/mcp/sdk/server.js:40:25)
+      at Object.<anonymous> (node_modules/playwright/lib/mcp/browser/config.js:50:21)
+      at Object.<anonymous> (node_modules/playwright/lib/mcp/test/browserBackend.js:24:21)
+      at Object.<anonymous> (node_modules/playwright/lib/index.js:45:29)
+      at Object.<anonymous> (node_modules/playwright/test.js:17:13)
+      at Object.<anonymous> (node_modules/@playwright/test/index.js:17:18)
+      at Object.<anonymous> (e2e/smoke.spec.ts:5:15)
 
-Test Suites: 1 failed, 1 total
-Tests:       0 total
+FAIL e2e/example.spec.ts
+  ● Test suite failed to run
+
+    ReferenceError: TransformStream is not defined
+
+    [0m [90m 3 |[39m test([32m'has title'[39m[33m,[39m [36masync[39m ({ page }) [33m=>[39m {
+     [90m 4 |[39m   [36mawait[39m page[33m.[39mgoto([32m'https://playwright.dev/'[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 5 |[39m
+     [90m   |[39m [31m[1m^[22m[39m
+     [90m 6 |[39m   [90m// Expect a title "to contain" a substring.[39m
+     [90m 7 |[39m   [36mawait[39m expect(page)[33m.[39mtoHaveTitle([35m/Playwright/[39m)[33m;[39m
+     [90m 8 |[39m })[33m;[39m[0m
+
+      at Object.<anonymous> (node_modules/playwright/lib/mcpBundleImpl.js:17:5390)
+      at Object.<anonymous> (node_modules/playwright/lib/mcp/sdk/bundle.js:48:22)
+      at Object.<anonymous> (node_modules/playwright/lib/mcp/sdk/server.js:40:25)
+      at Object.<anonymous> (node_modules/playwright/lib/mcp/browser/config.js:50:21)
+      at Object.<anonymous> (node_modules/playwright/lib/mcp/test/browserBackend.js:24:21)
+      at Object.<anonymous> (node_modules/playwright/lib/index.js:45:29)
+      at Object.<anonymous> (node_modules/playwright/test.js:17:13)
+      at Object.<anonymous> (node_modules/@playwright/test/index.js:17:18)
+      at Object.<anonymous> (e2e/example.spec.ts:5:15)
+
+Test Suites: 2 failed, 3 passed, 5 total
+Tests:       14 passed, 14 total
 Snapshots:   0 total
-Time:        1.303 s
-Ran all test suites matching SectionEditor.
+Time:        3.893 s
+Ran all test suites.

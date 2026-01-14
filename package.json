@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "test:e2e": "playwright test",
+    "test:ci": "npm run lint && npm run test && npm run text:e2e && npm run build"
   },
   "dependencies": {
     "@supabase/ssr": "^0.8.0",

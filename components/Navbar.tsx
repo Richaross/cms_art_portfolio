@@ -1,8 +1,7 @@
 'use client'
 
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { User, LogIn } from 'lucide-react';
+
 
 export default function Navbar() {
     const scrollToSection = (id: string) => {

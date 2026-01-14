@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Database } from '@/types/database';
 import { format } from 'date-fns';
-import { X, ExternalLink, ArrowRight } from 'lucide-react';
+import { X, ExternalLink } from 'lucide-react';
 
 type NewsPost = Database['public']['Tables']['news_posts']['Row'];
 
