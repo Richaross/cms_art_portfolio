@@ -128,6 +128,20 @@ The application uses a relational PostgreSQL schema designed for scalability and
 
 ---
 
+## 🔄 CI/CD Pipeline
+
+This project uses GitHub Actions for continuous integration. On every Pull Request and push to `main`, the following checks run automatically:
+
+- **Lint** - Code style validation (`npm run lint`)
+- **Type Check** - TypeScript compilation check (`tsc --noEmit`)
+- **Unit Tests** - Jest + React Testing Library (14 tests)
+- **E2E Tests** - Playwright smoke tests (12 tests across 3 browsers)
+- **Build** - Production bundle compilation (`npm run build`)
+
+All jobs run in parallel for fast feedback (~3-5 minutes). Failed checks block merging to maintain code quality.
+
+---
+
 ## 📂 Project Structure
 
 ```
@@ -156,9 +170,9 @@ Based on a production readiness audit, the following improvements are planned:
 - **Unit Testing**: ✅ Implemented `Jest` and `React Testing Library` for utility functions and complex components.
 - **E2E Testing**: ✅ Set up `Playwright` with smoke tests for critical user flows (landing page, navigation).
 
-### 2. CI/CD Pipeline
-- **GitHub Actions**: Establish a pipeline to run linter, type checks, and tests on every Pull Request.
-- **Build Checks**: Ensure the application compiles successfully before merging.
+### 2. CI/CD Pipeline ✅
+- **GitHub Actions**: ✅ Established pipeline to run linter, type checks, and tests on every Pull Request.
+- **Build Checks**: ✅ Ensure the application compiles successfully before merging.
 
 ### 3. Code Quality & Standards
 - **Prettier**: Enforce consistent code formatting.
