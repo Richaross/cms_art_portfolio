@@ -7,35 +7,39 @@ import { PortfolioSection } from '../../../app/domain/types';
 
 // Mock Server Actions
 jest.mock('../../../app/actions/portfolio', () => ({
-    saveSection: jest.fn(),
-    deleteSection: jest.fn(),
+  saveSection: jest.fn(),
+  deleteSection: jest.fn(),
 }));
 
 // Mock Child Components
 jest.mock('../ImageUploader', () => {
-    return function MockImageUploader({ value, onChange, label }: { value: string, onChange: (val: string) => void, label: string }) {
-        return (
-            <div data-testid="image-uploader">
-                <label>{label}</label>
-                <input
-                    data-testid="image-input"
-                    value={value}
-                    onChange={(e) => onChange(e.target.value)}
-                />
-            </div>
-        );
-    };
+  return function MockImageUploader({
+    value,
+    onChange,
+    label,
+  }: {
+    value: string;
+    onChange: (val: string) => void;
+    label: string;
+  }) {
+    return (
+      <div data-testid="image-uploader">
+        <label>{label}</label>
+        <input data-testid="image-input" value={value} onChange={(e) => onChange(e.target.value)} />
+      </div>
+    );
+  };
 });
 
 jest.mock('../ItemEditor', () => {
-    return function MockItemEditor({ onCancel }: { onCancel: () => void }) {
-        return (
-            <div data-testid="item-editor">
-                Mock Item Editor
-                <button onClick={onCancel}>Cancel Item</button>
-            </div>
-        );
-    };
+  return function MockItemEditor({ onCancel }: { onCancel: () => void }) {
+    return (
+      <div data-testid="item-editor">
+        Mock Item Editor
+        <button onClick={onCancel}>Cancel Item</button>
+      </div>
+    );
+  };
 });
 
 // Mock window.alert and window.confirm
@@ -47,119 +51,127 @@ window.confirm = mockConfirm;
 // --- Test Data ---
 
 const mockSection: PortfolioSection = {
-    id: '123',
-    title: 'Test Collection',
-    description: 'A test description',
-    imgUrl: 'test.jpg',
-    orderRank: 1,
-    items: [],
+  id: '123',
+  title: 'Test Collection',
+  description: 'A test description',
+  imgUrl: 'test.jpg',
+  orderRank: 1,
+  items: [],
 };
 
 describe('SectionEditor Component', () => {
-    beforeEach(() => {
-        jest.clearAllMocks();
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('renders "New Collection" mode when section prop is null', () => {
+    render(<SectionEditor section={null} onSave={jest.fn()} onCancel={jest.fn()} />);
+
+    expect(screen.getByText('New Collection')).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: /collection title/i })).toHaveValue('');
+  });
+
+  it('renders "Edit Collection" mode with existing data', () => {
+    render(<SectionEditor section={mockSection} onSave={jest.fn()} onCancel={jest.fn()} />);
+
+    expect(screen.getByText('Edit Collection')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('Test Collection')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('A test description')).toBeInTheDocument();
+  });
+
+  it('calls saveSection with correct data on form submission', async () => {
+    const onSaveMock = jest.fn();
+    (saveSection as jest.Mock).mockResolvedValue({ success: true });
+
+    render(<SectionEditor section={null} onSave={onSaveMock} onCancel={jest.fn()} />);
+
+    // Fill out form
+    fireEvent.change(screen.getByRole('textbox', { name: /collection title/i }), {
+      target: { value: 'New Masterpiece' },
+    });
+    fireEvent.change(screen.getByRole('textbox', { name: /description/i }), {
+      target: { value: 'My best work' },
     });
 
-    it('renders "New Collection" mode when section prop is null', () => {
-        render(<SectionEditor section={null} onSave={jest.fn()} onCancel={jest.fn()} />);
-
-        expect(screen.getByText('New Collection')).toBeInTheDocument();
-        expect(screen.getByRole('textbox', { name: /collection title/i })).toHaveValue('');
+    // Simulate Image Upload via mock
+    fireEvent.change(screen.getByTestId('image-input'), {
+      target: { value: 'new-image.jpg' },
     });
 
-    it('renders "Edit Collection" mode with existing data', () => {
-        render(<SectionEditor section={mockSection} onSave={jest.fn()} onCancel={jest.fn()} />);
+    // Submit
+    fireEvent.click(screen.getByRole('button', { name: /save collection/i }));
 
-        expect(screen.getByText('Edit Collection')).toBeInTheDocument();
-        expect(screen.getByDisplayValue('Test Collection')).toBeInTheDocument();
-        expect(screen.getByDisplayValue('A test description')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(saveSection).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: 'New Masterpiece',
+          description: 'My best work',
+          imgUrl: 'new-image.jpg',
+        })
+      );
+      expect(onSaveMock).toHaveBeenCalled();
+    });
+  });
+
+  it('handles save error gracefully', async () => {
+    (saveSection as jest.Mock).mockResolvedValue({ success: false, error: 'Database error' });
+
+    render(<SectionEditor section={null} onSave={jest.fn()} onCancel={jest.fn()} />);
+
+    // Fill minimum required title (assuming 'required' attribute on input)
+    fireEvent.change(screen.getByRole('textbox', { name: /collection title/i }), {
+      target: { value: 'Fail Test' },
     });
 
-    it('calls saveSection with correct data on form submission', async () => {
-        const onSaveMock = jest.fn();
-        (saveSection as jest.Mock).mockResolvedValue({ success: true });
+    fireEvent.click(screen.getByRole('button', { name: /save collection/i }));
 
-        render(<SectionEditor section={null} onSave={onSaveMock} onCancel={jest.fn()} />);
-
-        // Fill out form
-        fireEvent.change(screen.getByRole('textbox', { name: /collection title/i }), {
-            target: { value: 'New Masterpiece' }
-        });
-        fireEvent.change(screen.getByRole('textbox', { name: /description/i }), {
-            target: { value: 'My best work' }
-        });
-
-        // Simulate Image Upload via mock
-        fireEvent.change(screen.getByTestId('image-input'), {
-            target: { value: 'new-image.jpg' }
-        });
-
-        // Submit
-        fireEvent.click(screen.getByRole('button', { name: /save collection/i }));
-
-        await waitFor(() => {
-            expect(saveSection).toHaveBeenCalledWith(expect.objectContaining({
-                title: 'New Masterpiece',
-                description: 'My best work',
-                imgUrl: 'new-image.jpg'
-            }));
-            expect(onSaveMock).toHaveBeenCalled();
-        });
+    await waitFor(() => {
+      expect(mockAlert).toHaveBeenCalledWith(expect.stringContaining('Error saving collection'));
     });
+  });
 
-    it('handles save error gracefully', async () => {
-        (saveSection as jest.Mock).mockResolvedValue({ success: false, error: 'Database error' });
+  it('requests confirmation before deleting', async () => {
+    render(<SectionEditor section={mockSection} onSave={jest.fn()} onCancel={jest.fn()} />);
 
-        render(<SectionEditor section={null} onSave={jest.fn()} onCancel={jest.fn()} />);
+    // Mock confirmation cancel
+    mockConfirm.mockReturnValue(false);
+    const deleteBtn = screen.getByText('Delete Collection');
+    fireEvent.click(deleteBtn);
 
-        // Fill minimum required title (assuming 'required' attribute on input)
-        fireEvent.change(screen.getByRole('textbox', { name: /collection title/i }), { target: { value: 'Fail Test' } });
+    expect(mockConfirm).toHaveBeenCalled();
+    expect(deleteSection).not.toHaveBeenCalled();
 
-        fireEvent.click(screen.getByRole('button', { name: /save collection/i }));
+    // Mock confirmation confirm
+    mockConfirm.mockReturnValue(true);
+    (deleteSection as jest.Mock).mockResolvedValue({ success: true });
 
-        await waitFor(() => {
-            expect(mockAlert).toHaveBeenCalledWith(expect.stringContaining('Error saving collection'));
-        });
+    fireEvent.click(deleteBtn);
+
+    await waitFor(() => {
+      expect(deleteSection).toHaveBeenCalledWith('123', 'test.jpg');
     });
+  });
 
-    it('requests confirmation before deleting', async () => {
-        render(<SectionEditor section={mockSection} onSave={jest.fn()} onCancel={jest.fn()} />);
+  it('renders Items tab only when section exists', () => {
+    // New Collection -> No Tabs
+    const { rerender } = render(
+      <SectionEditor section={null} onSave={jest.fn()} onCancel={jest.fn()} />
+    );
+    expect(screen.queryByText('Metadata')).not.toBeInTheDocument();
 
-        // Mock confirmation cancel
-        mockConfirm.mockReturnValue(false);
-        const deleteBtn = screen.getByText('Delete Collection');
-        fireEvent.click(deleteBtn);
+    // Existing Collection -> Has Tabs
+    rerender(<SectionEditor section={mockSection} onSave={jest.fn()} onCancel={jest.fn()} />);
+    expect(screen.getByText('Metadata')).toBeInTheDocument();
+    expect(screen.getByText(/Collection Items/)).toBeInTheDocument();
+  });
 
-        expect(mockConfirm).toHaveBeenCalled();
-        expect(deleteSection).not.toHaveBeenCalled();
+  it('switches to Items tab and displays content', () => {
+    render(<SectionEditor section={mockSection} onSave={jest.fn()} onCancel={jest.fn()} />);
 
-        // Mock confirmation confirm
-        mockConfirm.mockReturnValue(true);
-        (deleteSection as jest.Mock).mockResolvedValue({ success: true });
+    fireEvent.click(screen.getByText(/Collection Items/));
 
-        fireEvent.click(deleteBtn);
-
-        await waitFor(() => {
-            expect(deleteSection).toHaveBeenCalledWith('123', 'test.jpg');
-        });
-    });
-
-    it('renders Items tab only when section exists', () => {
-        // New Collection -> No Tabs
-        const { rerender } = render(<SectionEditor section={null} onSave={jest.fn()} onCancel={jest.fn()} />);
-        expect(screen.queryByText('Metadata')).not.toBeInTheDocument();
-
-        // Existing Collection -> Has Tabs
-        rerender(<SectionEditor section={mockSection} onSave={jest.fn()} onCancel={jest.fn()} />);
-        expect(screen.getByText('Metadata')).toBeInTheDocument();
-        expect(screen.getByText(/Collection Items/)).toBeInTheDocument();
-    });
-
-    it('switches to Items tab and displays content', () => {
-        render(<SectionEditor section={mockSection} onSave={jest.fn()} onCancel={jest.fn()} />);
-
-        fireEvent.click(screen.getByText(/Collection Items/));
-
-        expect(screen.getByText('Manage individual artworks/products in this collection.')).toBeInTheDocument();
-    });
+    expect(
+      screen.getByText('Manage individual artworks/products in this collection.')
+    ).toBeInTheDocument();
+  });
 });

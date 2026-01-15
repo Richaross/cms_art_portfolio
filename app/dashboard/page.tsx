@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
@@ -21,12 +21,14 @@ const TABS = [
   { id: 'news', label: 'News', icon: Newspaper },
 ] as const;
 
-type TabId = typeof TABS[number]['id'];
+type TabId = (typeof TABS)[number]['id'];
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<TabId>('portfolio');
   const [sections, setSections] = useState<PortfolioSection[]>([]);
-  const [editingSection, setEditingSection] = useState<PortfolioSection | null | undefined>(undefined);
+  const [editingSection, setEditingSection] = useState<PortfolioSection | null | undefined>(
+    undefined
+  );
 
   const [loading, setLoading] = useState(true);
   const router = useRouter();
@@ -34,7 +36,9 @@ export default function DashboardPage() {
 
   // 1. Auth Check & Data Fetch
   const fetchData = useCallback(async () => {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     if (!session) {
       router.push('/login');
       return;
@@ -49,19 +53,21 @@ export default function DashboardPage() {
       if (error) console.error('Error fetching sections:', error);
       else {
         // Map database result to PortfolioSection
-        const mapped: PortfolioSection[] = (sectionsData || []).map(s => ({
+        const mapped: PortfolioSection[] = (sectionsData || []).map((s) => ({
           id: s.id,
           title: s.title,
           description: s.description,
           imgUrl: s.img_url,
           orderRank: s.order_rank,
-          inventory: s.inventory?.[0] ? {
-            sectionId: s.inventory[0].section_id,
-            stockQty: s.inventory[0].stock_qty,
-            price: s.inventory[0].price,
-            stripeLink: s.inventory[0].stripe_link,
-            isSaleActive: s.inventory[0].is_sale_active
-          } : null
+          inventory: s.inventory?.[0]
+            ? {
+                sectionId: s.inventory[0].section_id,
+                stockQty: s.inventory[0].stock_qty,
+                price: s.inventory[0].price,
+                stripeLink: s.inventory[0].stripe_link,
+                isSaleActive: s.inventory[0].is_sale_active,
+              }
+            : null,
         }));
         setSections(mapped);
       }
@@ -87,7 +93,10 @@ export default function DashboardPage() {
       {/* Sidebar / Tabs */}
       <aside className="w-full md:w-64 border-r border-white/10 p-6 flex flex-col bg-neutral-900/50">
         <div className="mb-8">
-          <Link href="/" className="text-xs text-gray-500 hover:text-white flex items-center gap-1 mb-4 transition-colors">
+          <Link
+            href="/"
+            className="text-xs text-gray-500 hover:text-white flex items-center gap-1 mb-4 transition-colors"
+          >
             <ArrowLeft size={12} /> Back to Website
           </Link>
           <h1 className="text-2xl font-bold tracking-tighter bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
@@ -96,7 +105,7 @@ export default function DashboardPage() {
         </div>
 
         <nav className="space-y-2 flex-1">
-          {TABS.map(tab => (
+          {TABS.map((tab) => (
             <button
               key={tab.id}
               onClick={() => {
@@ -109,10 +118,12 @@ export default function DashboardPage() {
                 <motion.div
                   layoutId="activeTab"
                   className="absolute inset-0 bg-white rounded"
-                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                 />
               )}
-              <span className={`relative z-20 flex items-center gap-3 ${activeTab === tab.id ? 'text-black' : 'text-gray-400 hover:text-white'}`}>
+              <span
+                className={`relative z-20 flex items-center gap-3 ${activeTab === tab.id ? 'text-black' : 'text-gray-400 hover:text-white'}`}
+              >
                 <tab.icon size={18} />
                 {tab.label}
               </span>

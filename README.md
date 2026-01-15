@@ -5,140 +5,82 @@ A high-performance, dark-themed art portfolio website featuring a custom Content
 ## ⚡ Technology Stack
 
 - **Framework**: [Next.js 16](https://nextjs.org/) (App Router, Server Actions, TypeScript)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
 - **Database**: [Supabase](https://supabase.com/) (PostgreSQL)
 - **Image Hosting**: [Cloudinary](https://cloudinary.com/) (Upload Widget & Management API)
 - **Icons**: [Lucide React](https://lucide.dev/)
 - **Animations**: [Framer Motion](https://www.framer.com/motion/)
 - **Payments**: Integrated Stripe links for direct purchasing.
-- **Testing**: [Jest](https://jestjs.io/) & [React Testing Library](https://testing-library.com/react)
+- **Testing**: [Jest](https://jestjs.io/), [React Testing Library](https://testing-library.com/react) & [Playwright](https://playwright.dev/)
 
 ---
 
 ## ✨ Features & Architecture
 
-### 1. Portfolio System (Collections)
-The portfolio is structured around **Collections** (previously "Sections"), which allows for grouping multiple artworks under a single thematic header.
+### 1. Public Portfolio
 
-- **Collections Grid**: The main page displays a responsive grid of Collections, each with a cover image, title, and description.
-- **Deep Zoom & Detail Modal**: Clicking a collection opens an immersive modal that reveals:
-    - **Header**: High-resolution cover image and collection statement.
-    - **Items Grid**: A nested grid displaying individual artworks contained within the collection.
-- **Item Details**: Each item in the collection has its own metadata:
-    - **Sales Status**: Items can be marked "For Sale" or "Archival/Not for Sale".
-    - **Inventory Management**: Real-time display of price and stock quantity.
-    - **Direct Purchase**: Integration with Stripe payment links for available items.
+- **Landing Hero**: Immersive, high-impact introduction to the artist's work.
+- **Portfolio System**: Structured around **Collections**, allowing for grouping multiple artworks under thematic headers.
+- **Deep Zoom & Detail Modal**: Immersive viewer for individual artworks with full metadata.
+- **Inventory Management**: Real-time stock counts, pricing, and "For Sale" status toggles.
+- **Stripe Integration**: Direct purchase links for archival or limited edition works.
 
 ### 2. Custom CMS (Dashboard)
-A secure, authenticated dashboard located at `/dashboard` provides full control over the website's content.
 
-- **Collection Management (`SectionEditor`)**:
-    - Manage Collection metadata (Title, Description, Cover Image).
-    - **Nested Item Management**: dedicated interface to Add, Edit, and Delete individual artworks (`SectionItem`) within a collection.
-    - **Drag-and-Drop Ordering**: Reorder collections and items to curate the viewer's journey.
-- **Image Management**:
-    - **Uploads**: Integrated Cloudinary widget for seamless, optimized image uploads.
-    - **Smart Deletion**: Automated cleanup logic ensures that when a Collection or Item is deleted, its associated image is permanently removed from Cloudinary to maintain storage hygiene.
-- **News & Updates**:
-    - Full blogging capability with `NewsEditor`.
-    - Supports Categories (Exhibitions, Press, General), Summaries, and External Links.
-- **About Section**:
-    - Real-time editing of the Artist's Biography and Portrait image.
+- **Service Layer Architecture**: Decoupled domain logic from Server Actions into dedicated services (`PortfolioService`, `NewsService`, `CloudinaryService`) for better testability and maintainability.
+- **Collection Management**: Full CRUD for collections and nested items with drag-and-drop ordering.
+- **Image Management**: Automated Cloudinary cleanup; deleting a record permanently removes its associated asset.
+- **News & Updates**: Categorized blog system (Exhibitions, Press, General) with external link support.
+- **About Editor**: Real-time updates for biography and portrait images.
 
 ### 3. Database Schema (Supabase)
 
-The application uses a relational PostgreSQL schema designed for scalability and data integrity.
+The application uses a relational PostgreSQL schema (validated via `schema_v4_items.sql`):
 
-- **`sections` (Collections)**:
-    - `id`, `title`, `description`, `img_url`, `order_rank`
-    - Acts as the parent container for artworks.
-- **`section_items` (Artworks/Products)**:
-    - Linked to `sections` via `section_id` (One-to-Many).
-    - `title`, `description`, `image_url`
-    - **Commerce Fields**: `price`, `stock_qty`, `is_sale_active`, `stripe_link`.
-- **`news_posts`**:
-    - Stores blog/news feedback with `category`, `summary`, and `link_url`.
-- **`about_info`**:
-    - Singleton row for storing the artist's bio and portrait.
+- `sections`: Parent container for collections.
+- `section_items`: Individual artworks linked to sections.
+- `inventory`: Real-time commerce details.
+- `news_posts`: Blog content and updates.
+- `about_info`: Artist biography and portrait data.
 
-### 4. Security & Performance
-- **Server Actions**: All data mutations (Create, Update, Delete) are handled via Next.js Server Actions, ensuring secure database interactions and keeping business logic off the client.
-- **Row Level Security (RLS)**: Supabase policies enforce that only authenticated users (the Admin) can modify data, while the public has read-only access.
-- **Optimized Rendering**: Utilizing Next.js Image optimization and Framer Motion for 60fps animations and transitions.
+### 4. Security & QA
 
-### 5. Testing & Quality Assurance
-- **Unit Testing**: Jest and React Testing Library for component and utility function tests.
-- **E2E Testing**: Playwright for end-to-end smoke tests across Chromium, Firefox, and WebKit.
-- **Test Coverage**: Critical CMS components (`SectionEditor`), UI components (`Navbar`), utility functions (`cloudinaryHelper`), and core user flows.
-- **Accessibility**: Components include proper ARIA labels and semantic HTML for improved testability and user experience.
+- **RBAC & RLS**: Supabase Row Level Security ensures only authenticated admins can mutate data.
+- **CI/CD Pipeline**: GitHub Actions running linting, type-checks, unit tests (Jest), and E2E smoke tests (Playwright) on every PR.
 
 ---
 
 ## 🚀 Getting Started
 
-### Prerequisites
-- Node.js 18+
-- Supabase Account
-- Cloudinary Account
-
 ### Installation
 
 1. **Clone the repository and install dependencies:**
+
    ```bash
    npm install
    ```
 
 2. **Configure Environment Variables:**
-   Create a `.env.local` file in the root directory:
-   ```env
-   # Supabase
-   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_key
+   Create a `.env.local` file:
 
-   # Cloudinary
-   NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your_cloud_name
-   NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=your_preset
-   NEXT_PUBLIC_CLOUDINARY_PUBLIC_API=your_api_key
-   NEXT_PUBLIC_CLOUDINARY_API_SECRET=your_api_secret
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=...
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+   NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=...
+   NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=...
+   NEXT_PUBLIC_CLOUDINARY_API_KEY=...
+   NEXT_PUBLIC_CLOUDINARY_API_SECRET=...
    ```
 
 3. **Database Setup:**
-   Run the SQL migrations provided in `schema_v4_items.sql` (and previous versions) in your Supabase SQL Editor to set up tables and RLS policies.
+   Apply `schema_v4_items.sql` in the Supabase SQL Editor.
 
-4. **Run Development Server:**
-   ```bash
-   npm run dev
-   ```
-   Open [http://localhost:3000](http://localhost:3000) to view the application.
+### Development & Testing
 
-5. **Run Tests:**
-   ```bash
-   npm run test
-   ```
-   Or run in watch mode during development:
-   ```bash
-   npm run test:watch
-   ```
-
-6. **Run E2E Tests:**
-   ```bash
-   npx playwright test
-   ```
-   Playwright will automatically start the dev server, run smoke tests, and verify critical user flows.
-
----
-
-## 🔄 CI/CD Pipeline
-
-This project uses GitHub Actions for continuous integration. On every Pull Request and push to `main`, the following checks run automatically:
-
-- **Lint** - Code style validation (`npm run lint`)
-- **Type Check** - TypeScript compilation check (`tsc --noEmit`)
-- **Unit Tests** - Jest + React Testing Library (14 tests)
-- **E2E Tests** - Playwright smoke tests (12 tests across 3 browsers)
-- **Build** - Production bundle compilation (`npm run build`)
-
-All jobs run in parallel for fast feedback (~3-5 minutes). Failed checks block merging to maintain code quality.
+- **Dev Server**: `npm run dev`
+- **Unit Tests**: `npm run test`
+- **E2E Tests**: `npm run test:e2e`
+- **CI Simulation**: `npm run test:ci` (Lint + Test + E2E + Build)
 
 ---
 
@@ -146,19 +88,32 @@ All jobs run in parallel for fast feedback (~3-5 minutes). Failed checks block m
 
 ```
 app/
-├── actions/            # Server Actions for DB mutations (portfolio.ts, news.ts, about.ts)
-├── app/               # Next.js App Router pages
-│   ├── dashboard/     # CMS Dashboard (Protected)
-│   ├── page.tsx       # Main Landing Page
-│   └── ...
-├── components/        # React Components
-│   ├── cms/           # Dashboard Editors (SectionEditor, ItemEditor, NewsEditor)
-│   ├── ui/            # Shared UI elements
-│   └── ...            # Public components (Portfolio, Navbar, About)
-├── domain/            # TypeScript interfaces and domain models
-├── lib/               # Shared utilities (Supabase client, Services)
-└── types/             # Database type definitions
+├── app/                  # Next.js App Router root
+│   ├── actions/          # Server Actions (Calling services)
+│   ├── domain/           # Domain models & abstractions
+│   ├── lib/services/     # Business logic layer (Service classes)
+│   └── ...               # App Router pages (dashboard, login, page.tsx)
+├── components/           # React Components
+│   ├── cms/              # Dashboard Editors (SectionEditor, NewsEditor)
+│   └── ui/               # Shared UI elements
+├── lib/                  # Infrastructure (Supabase client, Cloudinary)
+├── types/                # Database and Global type definitions
+└── e2e/                  # Playwright end-to-end tests
 ```
+
+---
+
+## 🏁 Production Readiness Gap Analysis
+
+Based on the latest report, the following critical steps were identified as **missing** and have been added to the Roadmap for future implementation:
+
+| Category          | Missing Component    | Recommendation                                     |
+| :---------------- | :------------------- | :------------------------------------------------- |
+| **Code Quality**  | Prettier & Husky     | Automated formatting and pre-commit linting hooks. |
+| **Monitoring**    | Sentry/LogRocket     | Real-time error tracking for production.           |
+| **Security**      | Env Validation (Zod) | Build-time validation of required secrets.         |
+| **Performance**   | Bundle Analyzer      | Ensuring client-side JS remains lean.              |
+| **Documentation** | CONTRIBUTING.md      | Guidelines for future dev onboardings.             |
 
 ---
 
@@ -167,21 +122,26 @@ app/
 Based on a production readiness audit, the following improvements are planned:
 
 ### 1. Automated Testing Suite ✅
+
 - **Unit Testing**: ✅ Implemented `Jest` and `React Testing Library` for utility functions and complex components.
 - **E2E Testing**: ✅ Set up `Playwright` with smoke tests for critical user flows (landing page, navigation).
 
 ### 2. CI/CD Pipeline ✅
+
 - **GitHub Actions**: ✅ Established pipeline to run linter, type checks, and tests on every Pull Request.
 - **Build Checks**: ✅ Ensure the application compiles successfully before merging.
 
-### 3. Code Quality & Standards
-- **Prettier**: Enforce consistent code formatting.
-- **Husky & Lint-Staged**: Run quality checks (linting/formatting) automatically on git commits.
+### 3. Code Quality & Standards ✅
+
+- **Prettier**: ✅ Enforce consistent code formatting.
+- **Husky & Lint-Staged**: ✅ Run quality checks (linting/formatting) automatically on git commits.
 
 ### 4. Monitoring & performance
+
 - **Error Logging**: Integrate Sentry for real-time error tracking in production.
 - **Performance**: Implement bundle analysis and strictly validate environment variables.
 
 ### 5. Security Hardening
+
 - **CSP**: Configure Content Security Policy headers.
 - **Env Validation**: Use `zod` to validate all environment variables at build time.
