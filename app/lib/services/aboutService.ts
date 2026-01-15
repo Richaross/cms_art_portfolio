@@ -4,20 +4,20 @@ import { AboutInfo } from '@/app/domain/types';
 
 export class AboutService {
   static async get(supabase: SupabaseClient<Database>): Promise<AboutInfo | null> {
-    const { data, error } = await supabase.from('about_info').select('*').single();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase as any).from('about_info').select('*').single();
 
     if (error || !data) return null;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result = data as any;
+    const row = data as Database['public']['Tables']['about_info']['Row'];
     return {
-      id: result.id,
-      description: result.description,
-      portraitUrl: result.portrait_url,
+      id: row.id,
+      description: row.description,
+      portraitUrl: row.portrait_url,
     };
   }
 
-  static async upset(supabase: SupabaseClient<Database>, info: Partial<AboutInfo>): Promise<void> {
+  static async upsert(supabase: SupabaseClient<Database>, info: Partial<AboutInfo>): Promise<void> {
     const dbRow: Database['public']['Tables']['about_info']['Insert'] = {
       id: info.id || 1, // Default ID concept
       description: info.description,
@@ -25,7 +25,7 @@ export class AboutService {
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await supabase.from('about_info').upsert(dbRow as any);
+    const { error } = await (supabase as any).from('about_info').upsert(dbRow);
     if (error) throw error;
   }
 }

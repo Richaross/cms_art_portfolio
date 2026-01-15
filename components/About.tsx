@@ -1,24 +1,23 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
+import { getAboutInfo } from '@/app/actions/about';
 import { motion } from 'framer-motion';
 
 export default function About() {
   const [description, setDescription] = useState('Loading about info...');
   const [portraitUrl, setPortraitUrl] = useState<string | null>(null);
-  const supabase = createClient();
 
   useEffect(() => {
     const fetchAbout = async () => {
-      const { data } = await supabase.from('about_info').select('*').single();
+      const data = await getAboutInfo();
       if (data) {
         setDescription(data.description || 'Welcome to the world of The Artist.');
-        setPortraitUrl(data.portrait_url);
+        setPortraitUrl(data.portraitUrl);
       }
     };
     fetchAbout();
-  }, [supabase]);
+  }, []);
 
   return (
     <section

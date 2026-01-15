@@ -15,7 +15,7 @@ export async function saveAboutInfo(
 ): Promise<{ success: boolean; error?: string }> {
   const supabase = await createClient();
   try {
-    await AboutService.upset(supabase, info);
+    await AboutService.upsert(supabase, info);
     revalidatePath('/dashboard');
     revalidatePath('/');
     return { success: true };

@@ -1,0 +1,2 @@
+components/About.tsx(16,29): error TS2339: Property 'description' does not exist on type 'never'.
+components/About.tsx(17,29): error TS2339: Property 'portrait_url' does not exist on type 'never'.
