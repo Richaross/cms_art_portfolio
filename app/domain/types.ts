@@ -49,3 +49,24 @@ export interface AboutInfo {
   description: string | null;
   portraitUrl: string | null;
 }
+
+export interface HeroSettings {
+  id: number;
+  bgImageUrl: string | null;
+  title: string | null;
+  dimIntensity: number;
+  socialLinks: {
+    instagram: boolean;
+    linkedin: boolean;
+    facebook: boolean;
+    whatsapp: boolean;
+    x: boolean;
+  };
+  socialUrls: {
+    instagram: string;
+    linkedin: string;
+    facebook: string;
+    whatsapp: string;
+    x: string;
+  };
+}

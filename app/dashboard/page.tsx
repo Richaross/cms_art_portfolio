@@ -11,14 +11,16 @@ import SectionList from '@/components/cms/SectionList';
 import SectionEditor from '@/components/cms/SectionEditor';
 import AboutEditor from '@/components/cms/AboutEditor';
 import NewsEditor from '@/components/cms/NewsEditor';
+import HeroEditor from '@/components/cms/HeroEditor';
 
 import { PortfolioSection } from '@/app/domain/types';
 import { Database } from '@/types/database';
 
 // Tabs Config
 const TABS = [
-  { id: 'portfolio', label: 'Portfolio', icon: LayoutGrid },
+  { id: 'hero', label: 'Hero Section', icon: User },
   { id: 'about', label: 'About', icon: User },
+  { id: 'portfolio', label: 'Portfolio', icon: LayoutGrid },
   { id: 'news', label: 'News', icon: Newspaper },
 ] as const;
 
@@ -199,6 +201,8 @@ export default function DashboardPage() {
               )}
             </>
           )}
+
+          {activeTab === 'hero' && <HeroEditor />}
 
           {activeTab === 'about' && <AboutEditor />}
 

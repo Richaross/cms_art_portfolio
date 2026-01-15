@@ -56,3 +56,12 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+# Sentry
+.sentry-debug-log
+
+# Turbopack/Turbo
+.turbo/
+
+# Logs
+*.log

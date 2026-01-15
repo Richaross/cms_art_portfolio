@@ -4,23 +4,27 @@ A high-performance, dark-themed art portfolio website featuring a custom Content
 
 ## 🖼️ Demo Gallery
 
-![Landing Hero](./README_images/image.png)
+<div align="center">
+
+![Landing Hero](./README_images/image.png)  
 _Landing Hero_
 
-![About Section](./README_images/image-1.png)
+![About Section](./README_images/image-1.png)  
 _About Section_
 
-![Portfolio - Collections](./README_images/image-2.png)
+![Portfolio - Collections](./README_images/image-2.png)  
 _Portfolio - Collections_
 
-![Portfolio - Items](./README_images/image-3.png)
+![Portfolio - Items](./README_images/image-3.png)  
 _Portfolio - Items_
 
-![News - Preview](./README_images/image-4.png)
+![News - Preview](./README_images/image-4.png)  
 _News - Preview_
 
-![News - Modal](./README_images/image-5.png)
+![News - Modal](./README_images/image-5.png)  
 _News - Modal_
+
+</div>
 
 ## ⚡ Technology Stack
 
@@ -30,7 +34,7 @@ _News - Modal_
 - **Image Hosting**: [Cloudinary](https://cloudinary.com/) (Upload Widget & Management API)
 - **Icons**: [Lucide React](https://lucide.dev/)
 - **Animations**: [Framer Motion](https://www.framer.com/motion/)
-- **Payments**: Integrated Stripe links for direct purchasing.
+- **Monitoring**: [Sentry](https://sentry.io/) (Error tracking & performance monitoring)
 - **Testing**: [Jest](https://jestjs.io/), [React Testing Library](https://testing-library.com/react) & [Playwright](https://playwright.dev/)
 
 ---
@@ -39,21 +43,20 @@ _News - Modal_
 
 ### 1. Public Portfolio
 
-- **Landing Hero**: Immersive, high-impact introduction to the artist's work.
+- **Dynamic Landing Hero**: Fully customizable immersive introduction. Artists can manage title, background image, and dimming intensity via the CMS.
+- **Social Integration**: High-visibility links to Instagram, LinkedIn, Facebook, WhatsApp, and X.
 - **Vertical Storytelling**: A redesigned portfolio experience that uses high-impact, full-width vertical scrolling for collections.
 - **Interactive Shop Window**: Real-time commerce integration with a sleek popup "Shop Window" for for-sale items.
 - **Archival Branding**: Premium "Archival" tags for pieces in private collections.
-- **Text Formatting**: Full support for manual line breaks in all collection and item descriptions.
 - **Inventory Management**: Real-time stock counts, pricing, and "For Sale" status toggles.
-- **Stripe Integration**: Direct purchase links for archival or limited edition works.
 
 ### 2. Custom CMS (Dashboard)
 
-- **Service Layer Architecture**: Decoupled domain logic from Server Actions into dedicated services (`PortfolioService`, `NewsService`, `CloudinaryService`) for better testability and maintainability.
-- **Collection Management**: Full CRUD for collections and nested items with drag-and-drop ordering.
-- **Image Management**: Automated Cloudinary cleanup; deleting a record permanently removes its associated asset.
-- **News & Updates**: Categorized blog system (Exhibitions, Press, General) with external link support.
-- **About Editor**: Real-time updates for biography and portrait images.
+- **Service Layer Architecture**: Decoupled domain logic from Server Actions into dedicated services (`PortfolioService`, `NewsService`, `CloudinaryService`, `AboutService`, `HeroService`) for better testability and maintainability.
+- **Dynamic Content Management**: A dedicated Hero Section editor to customize the landing page experience without touching code.
+- **Strict Type Safety**: 100% type-safe codebase using generated Supabase types and domain-driven interfaces.
+- **Automated Image Cleanup**: Built-in hooks to ensure that deleting a record permanently removes the asset from Cloudinary.
+- **Integrated Monitoring**: Sentry integration for real-time error capture and UI error state logging.
 
 ### 3. Database Schema (Supabase)
 
@@ -64,11 +67,13 @@ The application uses a relational PostgreSQL schema (validated via `schema_v4_it
 - `inventory`: Real-time commerce details.
 - `news_posts`: Blog content and updates.
 - `about_info`: Artist biography and portrait data.
+- `hero_settings`: Singleton table for landing page customization.
 
-### 4. Security & QA
+### 4. Quality Assurance & CI/CD
 
-- **RBAC & RLS**: Supabase Row Level Security ensures only authenticated admins can mutate data.
-- **CI/CD Pipeline**: GitHub Actions running linting, type-checks, unit tests (Jest), and E2E smoke tests (Playwright) on every PR.
+- **Test-First Culture**: Strict adherence to TDD principles. Every feature is backed by failing unit tests before implementation.
+- **CI Pipeline**: GitHub Actions running linting, type-checks, unit tests (Jest), and E2E smoke tests (Playwright) on every PR.
+- **Git Hooks**: Husky and `lint-staged` enforce code quality and formatting (Prettier) before every commit.
 
 ---
 
@@ -92,10 +97,12 @@ The application uses a relational PostgreSQL schema (validated via `schema_v4_it
    NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=...
    NEXT_PUBLIC_CLOUDINARY_API_KEY=...
    NEXT_PUBLIC_CLOUDINARY_API_SECRET=...
+   NEXT_PUBLIC_SENTRY_DSN=...
+   SENTRY_AUTH_TOKEN=...
    ```
 
 3. **Database Setup:**
-   Apply `schema_v4_items.sql` in the Supabase SQL Editor.
+   Apply `schema_v4_items.sql` and `schema_v5_hero.sql` in the Supabase SQL Editor.
 
 ### Development & Testing
 
@@ -118,7 +125,7 @@ app/
 ├── components/           # React Components
 │   ├── cms/              # Dashboard Editors (SectionEditor, NewsEditor)
 │   └── ui/               # Shared UI elements
-├── lib/                  # Infrastructure (Supabase client, Cloudinary)
+├── lib/                  # Infrastructure (Supabase client, Cloudinary, Sentry)
 ├── types/                # Database and Global type definitions
 └── e2e/                  # Playwright end-to-end tests
 ```
@@ -127,26 +134,25 @@ app/
 
 ## 🏁 Production Readiness Gap Analysis
 
-Based on the latest report, the following critical steps were identified as **missing** and have been added to the Roadmap for future implementation:
+Based on the latest report, the following critical steps were identified and have been implemented:
 
-| Category          | Missing Component    | Recommendation                                     |
-| :---------------- | :------------------- | :------------------------------------------------- |
-| **Code Quality**  | Prettier & Husky     | Automated formatting and pre-commit linting hooks. |
-| **Monitoring**    | Sentry/LogRocket     | Real-time error tracking for production.           |
-| **Security**      | Env Validation (Zod) | Build-time validation of required secrets.         |
-| **Performance**   | Bundle Analyzer      | Ensuring client-side JS remains lean.              |
-| **Documentation** | CONTRIBUTING.md      | Guidelines for future dev onboardings.             |
+| Category          | Component            | Status  | Implementation                                      |
+| :---------------- | :------------------- | :------ | :-------------------------------------------------- |
+| **Code Quality**  | Prettier & Husky     | ✅ Done | Automated formatting and pre-commit linting hooks.  |
+| **Monitoring**    | Sentry               | ✅ Done | Real-time error tracking and performance profiling. |
+| **Type Safety**   | Extreme Hardening    | ✅ Done | Elimination of `any` types across the entire core.  |
+| **Security**      | Env Validation (Zod) | 🏗️ Next | Build-time validation of required secrets.          |
+| **Performance**   | Bundle Analyzer      | 🏗️ Next | Ensuring client-side JS remains lean.               |
+| **Documentation** | CONTRIBUTING.md      | 🏗️ Next | Guidelines for future dev onboardings.              |
 
 ---
 
 ## 🔮 Future Updates & Roadmap
 
-Based on a production readiness audit, the following improvements are planned:
-
 ### 1. Automated Testing Suite ✅
 
 - **Unit Testing**: ✅ Implemented `Jest` and `React Testing Library` for utility functions and complex components.
-- **E2E Testing**: ✅ Set up `Playwright` with smoke tests for critical user flows (landing page, navigation).
+- **E2E Testing**: ✅ Set up `Playwright` with smoke tests for critical user flows.
 
 ### 2. CI/CD Pipeline ✅
 
@@ -155,13 +161,14 @@ Based on a production readiness audit, the following improvements are planned:
 
 ### 3. Code Quality & Standards ✅
 
-- **Prettier**: ✅ Enforce consistent code formatting.
-- **Husky & Lint-Staged**: ✅ Run quality checks (linting/formatting) automatically on git commits.
+- **Prettier**: ✅ Enforced consistent code formatting.
+- **Husky & Lint-Staged**: ✅ Quality checks are enforced at the commit level.
+- **Type Hardening**: ✅ 100% strict typing achievement.
 
-### 4. Monitoring & performance
+### 4. Monitoring & Performance ✅
 
-- **Error Logging**: Integrate Sentry for real-time error tracking in production.
-- **Performance**: Implement bundle analysis and strictly validate environment variables.
+- **Error Logging**: ✅ Sentry integrated for real-time error tracking.
+- **Performance**: 🏗️ Next: Implement bundle analysis and strictly validate environment variables.
 
 ### 5. Security Hardening
 
