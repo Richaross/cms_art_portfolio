@@ -13,6 +13,7 @@ import AboutEditor from '@/components/cms/AboutEditor';
 import NewsEditor from '@/components/cms/NewsEditor';
 
 import { PortfolioSection } from '@/app/domain/types';
+import { Database } from '@/types/database';
 
 // Tabs Config
 const TABS = [
@@ -47,28 +48,48 @@ export default function DashboardPage() {
     if (activeTab === 'portfolio') {
       const { data: sectionsData, error } = await supabase
         .from('sections')
-        .select('*, inventory(*)')
-        .order('order_rank', { ascending: true });
+        .select('*, inventory(*), section_items(*)')
+        .order('order_rank', { ascending: true })
+        .order('order_rank', { foreignTable: 'section_items', ascending: true });
 
       if (error) console.error('Error fetching sections:', error);
       else {
-        // Map database result to PortfolioSection
-        const mapped: PortfolioSection[] = (sectionsData || []).map((s) => ({
-          id: s.id,
-          title: s.title,
-          description: s.description,
-          imgUrl: s.img_url,
-          orderRank: s.order_rank,
-          inventory: s.inventory?.[0]
-            ? {
-                sectionId: s.inventory[0].section_id,
-                stockQty: s.inventory[0].stock_qty,
-                price: s.inventory[0].price,
-                stripeLink: s.inventory[0].stripe_link,
-                isSaleActive: s.inventory[0].is_sale_active,
-              }
-            : null,
-        }));
+        // Define specific type for the join query result
+        type SectionWithDetails = Database['public']['Tables']['sections']['Row'] & {
+          inventory: Database['public']['Tables']['inventory']['Row'][] | null;
+          section_items: Database['public']['Tables']['section_items']['Row'][] | null;
+        };
+
+        const mapped: PortfolioSection[] = ((sectionsData as SectionWithDetails[]) || []).map(
+          (s) => ({
+            id: s.id,
+            title: s.title,
+            description: s.description,
+            imgUrl: s.img_url,
+            orderRank: s.order_rank,
+            inventory: s.inventory?.[0]
+              ? {
+                  sectionId: s.inventory[0].section_id,
+                  stockQty: s.inventory[0].stock_qty,
+                  price: s.inventory[0].price,
+                  stripeLink: s.inventory[0].stripe_link,
+                  isSaleActive: s.inventory[0].is_sale_active,
+                }
+              : null,
+            items: (s.section_items || []).map((item) => ({
+              id: item.id,
+              sectionId: item.section_id,
+              title: item.title || 'Untitled',
+              description: item.description,
+              imageUrl: item.image_url,
+              price: item.price || 0,
+              stockQty: item.stock_qty || 0,
+              stripeLink: item.stripe_link,
+              isSaleActive: item.is_sale_active || false,
+              orderRank: item.order_rank || 0,
+            })),
+          })
+        );
         setSections(mapped);
       }
     }

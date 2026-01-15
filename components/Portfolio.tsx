@@ -19,6 +19,7 @@ export default function Portfolio() {
   const [sections, setSections] = useState<SectionWithItems[]>([]);
   const [selectedSection, setSelectedSection] = useState<SectionWithItems | null>(null);
   const [activeImage, setActiveImage] = useState<string | null>(null);
+  const [showShopForItem, setShowShopForItem] = useState<string | null>(null);
   const supabase = createClient();
 
   useEffect(() => {
@@ -83,7 +84,10 @@ export default function Portfolio() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              onClick={() => setSelectedSection(section)}
+              onClick={() => {
+                setSelectedSection(section);
+                setShowShopForItem(null); // Reset shop when opening section
+              }}
               onMouseEnter={() => setActiveImage(section.img_url)}
               className="break-inside-avoid group cursor-pointer"
             >
@@ -116,7 +120,7 @@ export default function Portfolio() {
                   {section.title || 'Untitled Collection'}
                 </h3>
                 {section.description && (
-                  <p className="text-sm text-gray-400 line-clamp-2 leading-relaxed">
+                  <p className="text-sm text-gray-400 line-clamp-2 leading-relaxed whitespace-pre-wrap">
                     {section.description}
                   </p>
                 )}
@@ -133,107 +137,154 @@ export default function Portfolio() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md"
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-xl"
             onClick={() => setSelectedSection(null)}
           >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-neutral-900 text-white w-full max-w-7xl rounded-2xl overflow-hidden flex flex-col max-h-[90vh] shadow-2xl border border-white/10"
+            {/* Close Button (Top Right of screen) */}
+            <button
+              onClick={() => setSelectedSection(null)}
+              className="fixed top-8 right-8 z-[110] p-3 bg-white/10 rounded-full hover:bg-white/20 transition-all text-white hover:rotate-90"
             >
-              {/* Modal Header */}
-              <div className="p-6 md:p-8 border-b border-white/10 flex justify-between items-start shrink-0">
-                <div>
-                  <h2 className="text-3xl font-bold mb-2">{selectedSection.title}</h2>
-                  <p className="text-gray-400 max-w-2xl">{selectedSection.description}</p>
-                </div>
-                <button
-                  onClick={() => setSelectedSection(null)}
-                  className="p-2 bg-white/10 rounded-full hover:bg-white/20 transition-colors"
-                >
-                  <X size={24} />
-                </button>
+              <X size={24} />
+            </button>
+
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 50 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-5xl h-full overflow-y-auto px-6 py-20 scroll-smooth no-scrollbar"
+            >
+              {/* Section Header */}
+              <div className="mb-20 text-center max-w-3xl mx-auto">
+                <h2 className="text-4xl md:text-6xl font-bold mb-6 tracking-tighter">
+                  {selectedSection.title}
+                </h2>
+                <p className="text-gray-400 text-lg leading-relaxed whitespace-pre-wrap">
+                  {selectedSection.description}
+                </p>
               </div>
 
-              {/* Items Grid (Scrollable) */}
-              <div className="p-6 md:p-8 overflow-y-auto">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {selectedSection.section_items?.map((item) => (
-                    <div
-                      key={item.id}
-                      className="bg-black rounded-lg overflow-hidden border border-white/5 hover:border-white/20 transition-all group"
-                    >
-                      {/* Item Image */}
-                      <div className="aspect-square bg-neutral-800 relative">
-                        {item.image_url ? (
-                          <>
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              src={item.image_url}
-                              alt={item.title || 'Item'}
-                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                            />
-                          </>
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-600">
-                            No Image
-                          </div>
-                        )}
+              {/* Vertical Vertical Item List */}
+              <div className="space-y-32 mb-20">
+                {selectedSection.section_items?.map((item) => (
+                  <div key={item.id} className="relative flex flex-col items-center group">
+                    {/* Item Image (Full Size) */}
+                    <div className="w-full max-w-4xl rounded-lg overflow-hidden bg-neutral-900 border border-white/5 relative">
+                      {item.image_url ? (
+                        <>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={item.image_url}
+                            alt={item.title || 'Artwork'}
+                            className="w-full h-auto object-contain cursor-pointer transition-transform duration-700 hover:scale-[1.02]"
+                            onClick={() => {
+                              if (item.is_sale_active) {
+                                setShowShopForItem(showShopForItem === item.id ? null : item.id);
+                              }
+                            }}
+                          />
+                        </>
+                      ) : (
+                        <div className="aspect-video w-full flex items-center justify-center text-gray-700">
+                          No Image
+                        </div>
+                      )}
 
-                        {/* Sale Badge */}
-                        {item.is_sale_active && (
-                          <div className="absolute top-2 right-2 bg-green-500 text-black text-[10px] font-bold px-2 py-0.5 rounded">
-                            FOR SALE
-                          </div>
+                      {/* Sale/Archival Badge on Image */}
+                      {!item.is_sale_active && (
+                        <div className="absolute top-4 right-4 bg-white/10 backdrop-blur-md text-white/50 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-[0.2em] border border-white/10">
+                          Archival
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Item Text Details Below */}
+                    <div className="mt-8 text-center max-w-2xl w-full">
+                      <h4 className="text-2xl font-bold mb-3">{item.title}</h4>
+                      {item.description && (
+                        <p className="text-gray-400 text-sm leading-relaxed whitespace-pre-wrap">
+                          {item.description}
+                        </p>
+                      )}
+
+                      {/* Interaction Area */}
+                      <div className="mt-6 flex justify-center">
+                        {item.is_sale_active ? (
+                          <button
+                            onClick={() =>
+                              setShowShopForItem(showShopForItem === item.id ? null : item.id)
+                            }
+                            className="text-xs font-bold uppercase tracking-widest text-white/70 hover:text-white flex items-center gap-2 border-b border-white/20 pb-1 transition-all"
+                          >
+                            <ShoppingBag size={14} />
+                            {showShopForItem === item.id ? 'Hide Details' : 'Purchase Details'}
+                          </button>
+                        ) : (
+                          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/30 italic">
+                            Part of Private Collection
+                          </span>
                         )}
                       </div>
+                    </div>
 
-                      {/* Item Details */}
-                      <div className="p-4 flex flex-col gap-2">
-                        <h4 className="font-bold text-lg truncate" title={item.title || ''}>
-                          {item.title}
-                        </h4>
-                        <p className="text-xs text-gray-400 line-clamp-2 h-8">{item.description}</p>
+                    {/* Shop Window (Dropdown/Overlay) */}
+                    <AnimatePresence>
+                      {showShopForItem === item.id && item.is_sale_active && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -20, height: 0 }}
+                          animate={{ opacity: 1, y: 0, height: 'auto' }}
+                          exit={{ opacity: 0, y: -20, height: 0 }}
+                          className="w-full max-w-md mt-6 overflow-hidden"
+                        >
+                          <div className="bg-white text-black p-8 rounded-2xl shadow-2xl flex flex-col md:flex-row items-center gap-8 relative">
+                            {/* Visual Indicator of Connection to Item */}
+                            <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white rotate-45" />
 
-                        {/* Buy / Price Area */}
-                        <div className="pt-2 mt-auto border-t border-white/10 flex items-center justify-between">
-                          {item.is_sale_active ? (
-                            <>
-                              <span className="text-xl font-bold text-green-400">
-                                ${item.price}
-                              </span>
+                            <div className="flex-1 space-y-4">
+                              <div className="flex justify-between items-end">
+                                <div>
+                                  <span className="text-[10px] font-bold uppercase tracking-tighter text-gray-400 block mb-1">
+                                    Price
+                                  </span>
+                                  <span className="text-3xl font-black">${item.price}</span>
+                                </div>
+                                <div className="text-right">
+                                  <span className="text-[10px] font-bold uppercase tracking-tighter text-gray-400 block mb-1">
+                                    Inventory
+                                  </span>
+                                  <span className="text-sm font-bold uppercase">
+                                    {item.stock_qty} Available
+                                  </span>
+                                </div>
+                              </div>
+
                               <a
                                 href={item.stripe_link || '#'}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className={`px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider flex items-center gap-1 ${
-                                  item.stripe_link
-                                    ? 'bg-white text-black hover:bg-gray-200'
-                                    : 'bg-gray-700 text-gray-400 cursor-not-allowed'
-                                }`}
+                                className="w-full py-4 bg-black text-white rounded-xl font-bold flex items-center justify-center gap-3 hover:bg-neutral-800 transition-all group active:scale-95"
                               >
-                                <ShoppingBag size={12} /> Buy
+                                <ShoppingBag size={18} />
+                                Buy Original Illustration
                               </a>
-                            </>
-                          ) : (
-                            <span className="text-xs text-gray-500 font-medium uppercase tracking-widest">
-                              Not for Sale
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {(!selectedSection.section_items || selectedSection.section_items.length === 0) && (
-                  <div className="text-center py-20 text-gray-500">
-                    <p>No items found in this collection.</p>
+                              <p className="text-[10px] text-center text-gray-400 font-medium uppercase tracking-tight">
+                                Secure Checkout Powered by Stripe
+                              </p>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
-                )}
+                ))}
               </div>
+
+              {(!selectedSection.section_items || selectedSection.section_items.length === 0) && (
+                <div className="text-center py-20 text-gray-500 italic">
+                  <p>No items found in this collection.</p>
+                </div>
+              )}
             </motion.div>
           </motion.div>
         )}

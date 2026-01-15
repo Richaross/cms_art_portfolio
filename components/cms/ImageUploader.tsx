@@ -16,6 +16,15 @@ export default function ImageUploader({ value, onChange, label = 'Image' }: Imag
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Check for macOS metadata files (AppleDouble)
+    if (file.name.startsWith('._')) {
+      alert(
+        `Invalid file: "${file.name}" appears to be a macOS metadata file and cannot be uploaded. Please select the actual image file.`
+      );
+      e.target.value = ''; // Reset input
+      return;
+    }
+
     setUploading(true);
     const formData = new FormData();
     formData.append('file', file);
@@ -29,15 +38,23 @@ export default function ImageUploader({ value, onChange, label = 'Image' }: Imag
         method: 'POST',
         body: formData,
       });
+
       const data = await response.json();
+
       if (data.secure_url) {
         onChange(data.secure_url);
       } else {
-        throw new Error(data.error?.message || 'Upload failed');
+        // Provide more detailed error message from Cloudinary if available
+        const errorMsg = data.error?.message || 'Upload failed';
+        if (errorMsg.includes('Invalid image file')) {
+          throw new Error('Upload failed: The file format is invalid or corrupted.');
+        }
+        throw new Error(errorMsg);
       }
-    } catch (error) {
-      console.error('Upload failed:', error);
-      alert('Upload failed. Check console for details.');
+    } catch (error: unknown) {
+      const err = error as Error;
+      console.error('Upload failed:', err);
+      alert(err.message || 'Upload failed. Check console for details.');
     } finally {
       setUploading(false);
     }

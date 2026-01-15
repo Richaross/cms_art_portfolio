@@ -130,8 +130,12 @@ export class PortfolioService {
     if (error) throw error;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private static mapToDomain(row: any): PortfolioSection {
+  private static mapToDomain(
+    row: Database['public']['Tables']['sections']['Row'] & {
+      inventory: Database['public']['Tables']['inventory']['Row'] | null;
+      section_items: Database['public']['Tables']['section_items']['Row'][];
+    }
+  ): PortfolioSection {
     return {
       id: row.id,
       title: row.title,
@@ -151,19 +155,20 @@ export class PortfolioService {
     };
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private static mapItemToDomain(row: any): SectionItem {
+  private static mapItemToDomain(
+    row: Database['public']['Tables']['section_items']['Row']
+  ): SectionItem {
     return {
       id: row.id,
       sectionId: row.section_id,
-      title: row.title,
+      title: row.title || 'Untitled',
       description: row.description,
       imageUrl: row.image_url,
-      price: row.price,
-      stockQty: row.stock_qty,
+      price: row.price || 0,
+      stockQty: row.stock_qty || 0,
       stripeLink: row.stripe_link,
-      isSaleActive: row.is_sale_active,
-      orderRank: row.order_rank,
+      isSaleActive: row.is_sale_active || false,
+      orderRank: row.order_rank || 0,
     };
   }
 }

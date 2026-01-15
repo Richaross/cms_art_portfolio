@@ -2,6 +2,26 @@
 
 A high-performance, dark-themed art portfolio website featuring a custom Content Management System (CMS), integrated directly with Supabase and Cloudinary. This application serves as a comprehensive platform for artists to showcase their work, manage sales through limited drops, and publish news updates.
 
+## 🖼️ Demo Gallery
+
+![Landing Hero](./README_images/image.png)
+_Landing Hero_
+
+![About Section](./README_images/image-1.png)
+_About Section_
+
+![Portfolio - Collections](./README_images/image-2.png)
+_Portfolio - Collections_
+
+![Portfolio - Items](./README_images/image-3.png)
+_Portfolio - Items_
+
+![News - Preview](./README_images/image-4.png)
+_News - Preview_
+
+![News - Modal](./README_images/image-5.png)
+_News - Modal_
+
 ## ⚡ Technology Stack
 
 - **Framework**: [Next.js 16](https://nextjs.org/) (App Router, Server Actions, TypeScript)
@@ -20,8 +40,10 @@ A high-performance, dark-themed art portfolio website featuring a custom Content
 ### 1. Public Portfolio
 
 - **Landing Hero**: Immersive, high-impact introduction to the artist's work.
-- **Portfolio System**: Structured around **Collections**, allowing for grouping multiple artworks under thematic headers.
-- **Deep Zoom & Detail Modal**: Immersive viewer for individual artworks with full metadata.
+- **Vertical Storytelling**: A redesigned portfolio experience that uses high-impact, full-width vertical scrolling for collections.
+- **Interactive Shop Window**: Real-time commerce integration with a sleek popup "Shop Window" for for-sale items.
+- **Archival Branding**: Premium "Archival" tags for pieces in private collections.
+- **Text Formatting**: Full support for manual line breaks in all collection and item descriptions.
 - **Inventory Management**: Real-time stock counts, pricing, and "For Sale" status toggles.
 - **Stripe Integration**: Direct purchase links for archival or limited edition works.
 

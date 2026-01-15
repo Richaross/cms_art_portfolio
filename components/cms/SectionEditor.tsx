@@ -278,7 +278,7 @@ export default function SectionEditor({ section, onSave, onCancel }: SectionEdit
               ))
             ) : (
               <div className="col-span-full text-center py-12 text-gray-500 italic border-2 border-dashed border-white/10 rounded">
-                <p>No sections found. Click &quot;Add New Collection&quot; to create one.</p>
+                <p>No items found in this collection. Click &quot;Add Item&quot; to get started.</p>
               </div>
             )}
           </div>
