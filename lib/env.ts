@@ -7,55 +7,53 @@ const emptyStringToUndefined = z.preprocess(
   z.string().optional()
 );
 
+/**
+ * Helper to provide a default value ONLY during CI.
+ * This ensures the Zod schema passes validation even with empty/missing secrets.
+ */
+const withCiFallback = (schema: z.ZodString | z.ZodOptional<z.ZodString>, fallback: string) => {
+  return z.preprocess((val) => {
+    if (isCI && (val === undefined || val === '' || val === null)) {
+      return fallback;
+    }
+    return val;
+  }, schema);
+};
+
 const envSchema = z.object({
   // Supabase
-  NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
+  NEXT_PUBLIC_SUPABASE_URL: withCiFallback(z.string().url(), 'https://placeholder.supabase.co'),
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: withCiFallback(z.string().min(1), 'placeholder-key'),
 
   // Cloudinary
-  NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: isCI
-    ? emptyStringToUndefined.pipe(z.string().min(1)).default('placeholder')
-    : emptyStringToUndefined.pipe(z.string().min(1)),
-  NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET: isCI
-    ? emptyStringToUndefined.pipe(z.string().min(1)).default('placeholder')
-    : emptyStringToUndefined.pipe(z.string().min(1)),
-  NEXT_PUBLIC_CLOUDINARY_API_KEY: isCI
-    ? emptyStringToUndefined.pipe(z.string().min(1)).default('placeholder')
-    : emptyStringToUndefined.pipe(z.string().min(1)),
-  NEXT_PUBLIC_CLOUDINARY_API_SECRET: isCI
-    ? emptyStringToUndefined.pipe(z.string().min(1)).default('placeholder')
-    : emptyStringToUndefined.pipe(z.string().min(1)),
+  NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: withCiFallback(z.string().min(1), 'placeholder'),
+  NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET: withCiFallback(z.string().min(1), 'placeholder'),
+  NEXT_PUBLIC_CLOUDINARY_API_KEY: withCiFallback(z.string().min(1), 'placeholder'),
+  NEXT_PUBLIC_CLOUDINARY_API_SECRET: withCiFallback(z.string().min(1), 'placeholder'),
 
   // Sentry
-  NEXT_PUBLIC_SENTRY_DSN: isCI
-    ? emptyStringToUndefined
-        .pipe(
-          z.union([
-            z
-              .string()
-              .url()
-              .refine(
-                (val) => val !== 'https://your_dsn_here.com',
-                'Sentry DSN is still a placeholder'
-              ),
-            z.literal('your_dsn_here'),
-          ])
-        )
-        .default('your_dsn_here')
-    : emptyStringToUndefined
-        .pipe(
-          z.union([
-            z
-              .string()
-              .url()
-              .refine(
-                (val) => val !== 'https://your_dsn_here.com',
-                'Sentry DSN is still a placeholder'
-              ),
-            z.literal('your_dsn_here'),
-          ])
-        )
-        .optional(),
+  NEXT_PUBLIC_SENTRY_DSN: z.preprocess(
+    (val) => {
+      if (isCI && (val === undefined || val === '' || val === null)) {
+        return 'your_dsn_here';
+      }
+      return val;
+    },
+    emptyStringToUndefined
+      .pipe(
+        z.union([
+          z
+            .string()
+            .url()
+            .refine(
+              (val) => val !== 'https://your_dsn_here.com',
+              'Sentry DSN is still a placeholder'
+            ),
+          z.literal('your_dsn_here'),
+        ])
+      )
+      .optional()
+  ),
   SENTRY_AUTH_TOKEN: z.string().min(1).optional(),
 
   // App Env
