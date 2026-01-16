@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { PortfolioService } from '@/app/lib/services/portfolioService';
+import { PortfolioRepository } from '@/app/lib/repositories/portfolioRepository';
 import { SectionItem } from '@/app/domain/types';
 
 export async function verifyPortfolioService() {
@@ -12,10 +13,12 @@ export async function verifyPortfolioService() {
   try {
     log('--- Verifying Portfolio Service ---');
     const supabase = await createClient();
+    const repository = new PortfolioRepository(supabase);
+    const service = new PortfolioService(repository);
 
     // 1. Create a Test Section
     log('Creating Test Section...');
-    const section = await PortfolioService.upsertSection(supabase, {
+    const section = await service.upsertSection({
       title: 'Test Collection',
       description: 'Test Description',
       orderRank: 999,
@@ -36,12 +39,12 @@ export async function verifyPortfolioService() {
       isSaleActive: true,
       orderRank: 0,
     };
-    const savedItem = await PortfolioService.upsertItem(supabase, item);
+    const savedItem = await service.upsertItem(item);
     log(`Item Created: ${savedItem.id}`);
 
     // 3. Verify Fetch
     log('Fetching Section...');
-    const fetchedSection = await PortfolioService.getById(supabase, section.id);
+    const fetchedSection = await service.getById(section.id);
     log(`Fetched Items Count: ${fetchedSection?.items?.length}`);
 
     if (fetchedSection?.items?.length !== 1) {
@@ -52,7 +55,7 @@ export async function verifyPortfolioService() {
 
     // 4. Cleanup
     log('Cleaning up...');
-    await PortfolioService.delete(supabase, section.id);
+    await service.deleteSection(section.id);
     log('Cleanup Complete');
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : 'Unknown error';

@@ -4,11 +4,21 @@ import { useEffect, useState } from 'react';
 import { getAboutInfo } from '@/app/actions/about';
 import { motion } from 'framer-motion';
 
-export default function About() {
-  const [description, setDescription] = useState('Loading about info...');
-  const [portraitUrl, setPortraitUrl] = useState<string | null>(null);
+import { AboutInfo } from '@/app/domain/types';
+
+interface AboutProps {
+  initialData?: AboutInfo | null;
+}
+
+export default function About({ initialData }: AboutProps) {
+  const [description, setDescription] = useState(
+    initialData?.description || 'Loading about info...'
+  );
+  const [portraitUrl, setPortraitUrl] = useState<string | null>(initialData?.portraitUrl || null);
 
   useEffect(() => {
+    if (initialData) return;
+
     const fetchAbout = async () => {
       const data = await getAboutInfo();
       if (data) {
@@ -17,7 +27,7 @@ export default function About() {
       }
     };
     fetchAbout();
-  }, []);
+  }, [initialData]);
 
   return (
     <section

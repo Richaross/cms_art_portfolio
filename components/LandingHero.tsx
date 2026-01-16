@@ -9,11 +9,19 @@ import { HeroService } from '@/app/lib/services/heroService';
 import { HeroRepository } from '@/app/lib/repositories/heroRepository';
 import { HeroSettings } from '@/app/domain/types';
 
-export default function LandingHero() {
-  const [settings, setSettings] = useState<HeroSettings | null>(null);
+interface LandingHeroProps {
+  initialSettings?: HeroSettings | null;
+}
+
+export default function LandingHero({ initialSettings }: LandingHeroProps) {
+  const [settings, setSettings] = useState<HeroSettings | null>(initialSettings || null);
   const [supabase] = useState(() => createClient());
 
   useEffect(() => {
+    // If we have initial settings, we don't necessarily need to fetch immediately
+    // unless we want to ensure client-side state is perfectly synced with DB
+    if (initialSettings) return;
+
     async function fetchSettings() {
       try {
         const repository = new HeroRepository(supabase);
@@ -25,9 +33,9 @@ export default function LandingHero() {
       }
     }
     fetchSettings();
-  }, [supabase]);
+  }, [supabase, initialSettings]);
 
-  // Fallback if settings are not yet loaded
+  // Fallback if settings are not yet loaded (though with SSR they should be)
   const bgImage =
     settings?.bgImageUrl ||
     'https://images.unsplash.com/photo-1547891654-e66ed7ebb968?q=80&w=2070&auto=format&fit=crop';

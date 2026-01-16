@@ -22,7 +22,12 @@ export class PortfolioRepository implements IPortfolioRepository {
     if (error) throw error;
     if (!data) return [];
 
-    return data.map(this.mapToDomain);
+    type PortfolioSectionRow = Database['public']['Tables']['sections']['Row'] & {
+      inventory: Database['public']['Tables']['inventory']['Row'] | null;
+      section_items: Database['public']['Tables']['section_items']['Row'][];
+    };
+
+    return (data as unknown as PortfolioSectionRow[]).map((row) => this.mapToDomain(row));
   }
 
   async getById(id: string): Promise<PortfolioSection | null> {
@@ -134,7 +139,7 @@ export class PortfolioRepository implements IPortfolioRepository {
             isSaleActive: row.inventory.is_sale_active,
           }
         : null,
-      items: row.section_items ? row.section_items.map(this.mapItemToDomain) : [],
+      items: row.section_items ? row.section_items.map((item) => this.mapItemToDomain(item)) : [],
     };
   }
 

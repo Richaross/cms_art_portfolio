@@ -4,29 +4,55 @@ import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Database } from '@/types/database';
+
 import { format } from 'date-fns';
 import { X, ExternalLink } from 'lucide-react';
 
-type NewsPost = Database['public']['Tables']['news_posts']['Row'];
+import { NewsPost } from '@/app/domain/types';
 
-export default function News() {
-  const [posts, setPosts] = useState<NewsPost[]>([]);
+interface NewsProps {
+  initialPosts?: NewsPost[];
+}
+
+export default function News({ initialPosts = [] }: NewsProps) {
+  const [posts, setPosts] = useState<NewsPost[]>(initialPosts);
   const [showAll, setShowAll] = useState(false);
   const [selectedPost, setSelectedPost] = useState<NewsPost | null>(null);
   const supabase = createClient();
 
   useEffect(() => {
+    if (initialPosts.length > 0) return;
+
     const fetchNews = async () => {
       const { data } = await supabase
         .from('news_posts')
         .select('*')
         .eq('is_published', true)
         .order('published_at', { ascending: false })
-        .limit(50); // Fetch more to allow expansion
-      if (data) setPosts(data);
+        .limit(50);
+
+      if (data) {
+        // Map to domain to be consistent with posts state
+        const mapped: NewsPost[] = (
+          data as Database['public']['Tables']['news_posts']['Row'][]
+        ).map((row) => ({
+          id: row.id,
+          title: row.title,
+          summary: row.summary,
+          category: row.category || 'General',
+          content: row.content,
+          imageUrl: row.image_url,
+          externalLink: row.external_link,
+          isPublished: row.is_published ?? false,
+          publishedAt: row.published_at ? new Date(row.published_at) : null,
+          createdAt: new Date(row.created_at),
+          updatedAt: row.updated_at ? new Date(row.updated_at) : new Date(row.created_at),
+        }));
+        setPosts(mapped);
+      }
     };
     fetchNews();
-  }, [supabase]);
+  }, [supabase, initialPosts]);
 
   const displayedPosts = showAll ? posts : posts.slice(0, 3);
 
@@ -69,10 +95,10 @@ export default function News() {
               >
                 {/* Card Content */}
                 <div className="relative aspect-[4/3] bg-neutral-800 rounded-lg overflow-hidden mb-6">
-                  {post.image_url ? (
+                  {post.imageUrl ? (
                     /* eslint-disable-next-line @next/next/no-img-element */
                     <img
-                      src={post.image_url}
+                      src={post.imageUrl}
                       alt={post.title}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
@@ -91,7 +117,7 @@ export default function News() {
 
                 <div className="space-y-3">
                   <div className="text-xs text-gray-500 font-medium uppercase tracking-wider">
-                    {format(new Date(post.published_at || post.created_at), 'MMMM d, yyyy')}
+                    {format(new Date(post.publishedAt || post.createdAt), 'MMMM d, yyyy')}
                   </div>
                   <h3 className="text-xl font-bold group-hover:underline decoration-1 underline-offset-4">
                     {post.title}
@@ -149,11 +175,11 @@ export default function News() {
               </button>
 
               {/* Modal Image */}
-              {selectedPost.image_url && (
+              {selectedPost.imageUrl && (
                 <div className="relative h-64 md:h-80 w-full bg-neutral-800">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={selectedPost.image_url}
+                    src={selectedPost.imageUrl}
                     alt={selectedPost.title}
                     className="w-full h-full object-cover"
                   />
@@ -170,7 +196,7 @@ export default function News() {
                 <div>
                   <div className="text-sm text-gray-500 font-medium uppercase tracking-wider mb-2">
                     {format(
-                      new Date(selectedPost.published_at || selectedPost.created_at),
+                      new Date(selectedPost.publishedAt || selectedPost.createdAt),
                       'MMMM d, yyyy'
                     )}
                   </div>
@@ -185,10 +211,10 @@ export default function News() {
                 </div>
 
                 {/* External Link Button */}
-                {selectedPost.external_link && (
+                {selectedPost.externalLink && (
                   <div className="pt-6 border-t border-white/10">
                     <a
-                      href={selectedPost.external_link}
+                      href={selectedPost.externalLink}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-full font-bold hover:bg-gray-200 transition-colors"

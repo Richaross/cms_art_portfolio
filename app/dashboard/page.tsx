@@ -27,7 +27,7 @@ const TABS = [
 type TabId = (typeof TABS)[number]['id'];
 
 export default function DashboardPage() {
-  const [activeTab, setActiveTab] = useState<TabId>('portfolio');
+  const [activeTab, setActiveTab] = useState<TabId>('hero');
   const [sections, setSections] = useState<PortfolioSection[]>([]);
   const [editingSection, setEditingSection] = useState<PortfolioSection | null | undefined>(
     undefined

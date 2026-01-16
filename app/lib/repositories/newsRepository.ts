@@ -15,7 +15,7 @@ export class NewsRepository implements INewsRepository {
     if (error) throw error;
     if (!data) return [];
 
-    return data.map(this.mapToDomain);
+    return data.map((row) => this.mapToDomain(row));
   }
 
   async upsert(post: Partial<NewsPost>): Promise<void> {

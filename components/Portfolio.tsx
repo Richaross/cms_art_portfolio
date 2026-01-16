@@ -4,36 +4,75 @@ import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Database } from '@/types/database';
+
 import { X, ShoppingBag } from 'lucide-react';
 
-type Section = Database['public']['Tables']['sections']['Row'] & {
-  inventory: Database['public']['Tables']['inventory']['Row'] | null;
-};
+import { PortfolioSection } from '@/app/domain/types';
 
-export default function Portfolio() {
-  // We update the type to include section_items
-  type SectionWithItems = Section & {
-    section_items: Database['public']['Tables']['section_items']['Row'][];
-  };
+interface PortfolioProps {
+  initialSections?: PortfolioSection[];
+}
 
-  const [sections, setSections] = useState<SectionWithItems[]>([]);
-  const [selectedSection, setSelectedSection] = useState<SectionWithItems | null>(null);
+export default function Portfolio({ initialSections = [] }: PortfolioProps) {
+  const [sections, setSections] = useState<PortfolioSection[]>(initialSections);
+  const [selectedSection, setSelectedSection] = useState<PortfolioSection | null>(null);
   const [activeImage, setActiveImage] = useState<string | null>(null);
   const [showShopForItem, setShowShopForItem] = useState<string | null>(null);
   const supabase = createClient();
 
   useEffect(() => {
+    if (initialSections.length > 0) return;
+
     const fetchSections = async () => {
+      // We still use the client-side fetch as a fallback if no SSR data,
+      // but we'll try to keep it consistent with the domain model if possible.
+      // For now, let's assume we want to fetch the same way we do in the service.
       const { data } = await supabase
         .from('sections')
-        .select('*, inventory(*), section_items(*)') // Fetch Items
+        .select('*, inventory(*), section_items(*)')
         .order('order_rank', { ascending: true })
-        .order('order_rank', { foreignTable: 'section_items', ascending: true }); // Order items
+        .order('order_rank', { foreignTable: 'section_items', ascending: true });
 
-      if (data) setSections(data as SectionWithItems[]);
+      if (data) {
+        // Map to domain to be consistent with sections state
+        type SectionWithDetails = Database['public']['Tables']['sections']['Row'] & {
+          inventory: Database['public']['Tables']['inventory']['Row'] | null;
+          section_items: Database['public']['Tables']['section_items']['Row'][];
+        };
+
+        const mapped: PortfolioSection[] = (data as unknown as SectionWithDetails[]).map((row) => ({
+          id: row.id,
+          title: row.title,
+          description: row.description,
+          imgUrl: row.img_url,
+          orderRank: row.order_rank,
+          inventory: row.inventory
+            ? {
+                sectionId: row.inventory.section_id,
+                stockQty: row.inventory.stock_qty,
+                price: row.inventory.price,
+                stripeLink: row.inventory.stripe_link,
+                isSaleActive: row.inventory.is_sale_active,
+              }
+            : null,
+          items: (row.section_items || []).map((item) => ({
+            id: item.id,
+            sectionId: item.section_id,
+            title: item.title || 'Untitled',
+            description: item.description,
+            imageUrl: item.image_url,
+            price: item.price || 0,
+            stockQty: item.stock_qty || 0,
+            stripeLink: item.stripe_link,
+            isSaleActive: item.is_sale_active || false,
+            orderRank: item.order_rank || 0,
+          })),
+        }));
+        setSections(mapped);
+      }
     };
     fetchSections();
-  }, [supabase]);
+  }, [supabase, initialSections]);
 
   return (
     <section
@@ -88,16 +127,16 @@ export default function Portfolio() {
                 setSelectedSection(section);
                 setShowShopForItem(null); // Reset shop when opening section
               }}
-              onMouseEnter={() => setActiveImage(section.img_url)}
+              onMouseEnter={() => setActiveImage(section.imgUrl)}
               className="break-inside-avoid group cursor-pointer"
             >
               {/* Collection Cover Image */}
               <div className="relative overflow-hidden rounded-lg bg-neutral-900 mb-4 aspect-[4/5]">
-                {section.img_url ? (
+                {section.imgUrl ? (
                   <>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={section.img_url}
+                      src={section.imgUrl}
                       alt={section.title || 'Collection'}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
@@ -110,7 +149,7 @@ export default function Portfolio() {
 
                 {/* Badge if items exist */}
                 <div className="absolute top-3 right-3 bg-black/60 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider backdrop-blur-sm">
-                  {section.section_items?.length || 0} Items
+                  {section.items?.length || 0} Items
                 </div>
               </div>
 
@@ -167,19 +206,19 @@ export default function Portfolio() {
 
               {/* Vertical Vertical Item List */}
               <div className="space-y-32 mb-20">
-                {selectedSection.section_items?.map((item) => (
+                {selectedSection.items?.map((item) => (
                   <div key={item.id} className="relative flex flex-col items-center group">
                     {/* Item Image (Full Size) */}
                     <div className="w-full max-w-4xl rounded-lg overflow-hidden bg-neutral-900 border border-white/5 relative">
-                      {item.image_url ? (
+                      {item.imageUrl ? (
                         <>
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
-                            src={item.image_url}
+                            src={item.imageUrl}
                             alt={item.title || 'Artwork'}
                             className="w-full h-auto object-contain cursor-pointer transition-transform duration-700 hover:scale-[1.02]"
                             onClick={() => {
-                              if (item.is_sale_active) {
+                              if (item.isSaleActive) {
                                 setShowShopForItem(showShopForItem === item.id ? null : item.id);
                               }
                             }}
@@ -192,7 +231,7 @@ export default function Portfolio() {
                       )}
 
                       {/* Sale/Archival Badge on Image */}
-                      {!item.is_sale_active && (
+                      {!item.isSaleActive && (
                         <div className="absolute top-4 right-4 bg-white/10 backdrop-blur-md text-white/50 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-[0.2em] border border-white/10">
                           Archival
                         </div>
@@ -210,7 +249,7 @@ export default function Portfolio() {
 
                       {/* Interaction Area */}
                       <div className="mt-6 flex justify-center">
-                        {item.is_sale_active ? (
+                        {item.isSaleActive ? (
                           <button
                             onClick={() =>
                               setShowShopForItem(showShopForItem === item.id ? null : item.id)
@@ -230,7 +269,7 @@ export default function Portfolio() {
 
                     {/* Shop Window (Dropdown/Overlay) */}
                     <AnimatePresence>
-                      {showShopForItem === item.id && item.is_sale_active && (
+                      {showShopForItem === item.id && item.isSaleActive && (
                         <motion.div
                           initial={{ opacity: 0, y: -20, height: 0 }}
                           animate={{ opacity: 1, y: 0, height: 'auto' }}
@@ -254,13 +293,13 @@ export default function Portfolio() {
                                     Inventory
                                   </span>
                                   <span className="text-sm font-bold uppercase">
-                                    {item.stock_qty} Available
+                                    {item.stockQty} Available
                                   </span>
                                 </div>
                               </div>
 
                               <a
-                                href={item.stripe_link || '#'}
+                                href={item.stripeLink || '#'}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="w-full py-4 bg-black text-white rounded-xl font-bold flex items-center justify-center gap-3 hover:bg-neutral-800 transition-all group active:scale-95"
@@ -280,7 +319,7 @@ export default function Portfolio() {
                 ))}
               </div>
 
-              {(!selectedSection.section_items || selectedSection.section_items.length === 0) && (
+              {(!selectedSection.items || selectedSection.items.length === 0) && (
                 <div className="text-center py-20 text-gray-500 italic">
                   <p>No items found in this collection.</p>
                 </div>
