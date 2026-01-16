@@ -11,9 +11,11 @@
     "test:watch": "jest --watch",
     "test:e2e": "playwright test",
     "test:ci": "npm run lint && npm run test && npm run text:e2e && npm run build",
+    "analyze": "next build --experimental-analyze",
     "prepare": "husky"
   },
   "dependencies": {
+    "@next/bundle-analyzer": "^16.1.2",
     "@sentry/nextjs": "^10.34.0",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.90.1",
@@ -23,7 +25,8 @@
     "lucide-react": "^0.562.0",
     "next": "16.1.1",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "zod": "^4.3.5"
   },
   "devDependencies": {
     "@playwright/test": "^1.57.0",
@@ -35,6 +38,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "cross-env": "^10.1.0",
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
     "eslint-config-prettier": "^10.1.8",

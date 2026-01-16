@@ -1,0 +1,56 @@
+
+> app@0.1.0 analyze
+> cross-env ANALYZE=true next build
+
+Bundle Analyzer Enabled: true
+[@sentry/nextjs] DEPRECATION WARNING: disableLogger is deprecated and will be removed in a future version. Use webpack.treeshake.removeDebugLogging instead. (Not supported with Turbopack.)
+[@sentry/nextjs] DEPRECATION WARNING: automaticVercelMonitors is deprecated and will be removed in a future version. Use webpack.automaticVercelMonitors instead. (Not supported with Turbopack.)
+[@sentry/nextjs] DEPRECATION WARNING: reactComponentAnnotation is deprecated and will be removed in a future version. Use webpack.reactComponentAnnotation instead. (Not supported with Turbopack.)
+The Next Bundle Analyzer is not compatible with Turbopack builds, no report will be generated.
+
+Consider trying the new Turbopack analyzer via `next experimental-analyze`.
+
+See https://nextjs.org/docs/app/guides/package-bundling for more information
+
+To run this analysis pass the `--webpack` flag to `next build`
+▲ Next.js 16.1.1 (Turbopack)
+- Environments: .env.local
+- Experiments (use with caution):
+  · clientTraceMetadata
+
+  Creating an optimized production build ...
+Bundle Analyzer Enabled: true
+[@sentry/nextjs] DEPRECATION WARNING: disableLogger is deprecated and will be removed in a future version. Use webpack.treeshake.removeDebugLogging instead. (Not supported with Turbopack.)
+[@sentry/nextjs] DEPRECATION WARNING: automaticVercelMonitors is deprecated and will be removed in a future version. Use webpack.automaticVercelMonitors instead. (Not supported with Turbopack.)
+[@sentry/nextjs] DEPRECATION WARNING: reactComponentAnnotation is deprecated and will be removed in a future version. Use webpack.reactComponentAnnotation instead. (Not supported with Turbopack.)
+The Next Bundle Analyzer is not compatible with Turbopack builds, no report will be generated.
+
+Consider trying the new Turbopack analyzer via `next experimental-analyze`.
+
+See https://nextjs.org/docs/app/guides/package-bundling for more information
+
+To run this analysis pass the `--webpack` flag to `next build`
+✓ Compiled successfully in 6.3s
+  Running next.config.js provided runAfterProductionCompile ...
+✓ Completed runAfterProductionCompile in 748ms
+  Running TypeScript ...
+  Collecting page data using 15 workers ...
+  Generating static pages using 15 workers (0/6) ...
+  Generating static pages using 15 workers (1/6) 
+  Generating static pages using 15 workers (2/6) 
+  Generating static pages using 15 workers (4/6) 
+✓ Generating static pages using 15 workers (6/6) in 1091.9ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ƒ /
+├ ○ /_not-found
+├ ƒ /api/images/delete
+├ ○ /dashboard
+├ ○ /login
+└ ƒ /test-service
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

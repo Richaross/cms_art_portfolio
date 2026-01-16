@@ -4,7 +4,7 @@ import { getPublicIdFromUrl } from '../cloudinaryUtils';
 // Configure usage in a singleton-like module or init here
 cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.NEXT_PUBLIC_CLOUDINARY_PUBLIC_API,
+  api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
   api_secret: process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET,
   secure: true,
 });
