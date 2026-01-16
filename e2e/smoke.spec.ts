@@ -5,7 +5,7 @@ test('landing page loads and displays portfolio grid', async ({ page }) => {
   await page.goto('http://localhost:3000');
 
   // 2. Check for the main title or logo
-  await expect(page.getByText('ArtPortfolio')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'ArtPortfolio' })).toBeVisible();
 
   // 3. Check that at least one "Portfolio Collection" card is visible
   // Assuming cards have a specific class or structure?

@@ -13,12 +13,15 @@ const envSchema = z.object({
 
   // Sentry
   NEXT_PUBLIC_SENTRY_DSN: z
-    .string()
-    .url()
-    .refine((val) => val !== 'https://your_dsn_here.com', 'Sentry DSN is still a placeholder')
-    .optional()
-    .or(z.literal('your_dsn_here')),
-  SENTRY_AUTH_TOKEN: z.string().min(1).optional(), // Some environments might not need this if already logged in via CLI
+    .union([
+      z
+        .string()
+        .url()
+        .refine((val) => val !== 'https://your_dsn_here.com', 'Sentry DSN is still a placeholder'),
+      z.literal('your_dsn_here'),
+    ])
+    .optional(),
+  SENTRY_AUTH_TOKEN: z.string().min(1).optional(),
 
   // App Env
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
