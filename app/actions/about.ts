@@ -2,20 +2,27 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { AboutService } from '@/app/lib/services/aboutService';
+import { AboutRepository } from '@/app/lib/repositories/aboutRepository';
 import { AboutInfo } from '@/app/domain/types';
 import { revalidatePath } from 'next/cache';
 
-export async function getAboutInfo(): Promise<AboutInfo | null> {
+async function getAboutService() {
   const supabase = await createClient();
-  return AboutService.get(supabase);
+  const repository = new AboutRepository(supabase);
+  return new AboutService(repository);
+}
+
+export async function getAboutInfo(): Promise<AboutInfo | null> {
+  const service = await getAboutService();
+  return service.get();
 }
 
 export async function saveAboutInfo(
   info: Partial<AboutInfo>
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = await createClient();
+  const service = await getAboutService();
   try {
-    await AboutService.upsert(supabase, info);
+    await service.upsert(info);
     revalidatePath('/dashboard');
     revalidatePath('/');
     return { success: true };

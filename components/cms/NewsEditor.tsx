@@ -4,12 +4,11 @@ import { useState, useEffect } from 'react';
 import { Trash2, Plus, Edit } from 'lucide-react';
 import { format } from 'date-fns';
 import ImageUploader from './ImageUploader';
-import { createClient } from '@/lib/supabase/client';
+
 import { getNewsPosts, saveNewsPost, deleteNewsPost } from '@/app/actions/news';
 import { NewsPost } from '@/app/domain/types';
 
 export default function NewsEditor() {
-  const supabase = createClient();
   const [posts, setPosts] = useState<NewsPost[]>([]);
   const [editingPost, setEditingPost] = useState<NewsPost | null | undefined>(undefined);
   // undefined=list, null=new, object=edit
@@ -20,16 +19,16 @@ export default function NewsEditor() {
   };
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      const { data } = await supabase
-        .from('news_posts')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (data) setPosts(data);
+    let isMounted = true;
+    const loadData = async () => {
+      const data = await getNewsPosts();
+      if (isMounted) setPosts(data);
     };
-    fetchPosts();
-  }, [supabase]);
+    loadData();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   if (editingPost !== undefined) {
     return (

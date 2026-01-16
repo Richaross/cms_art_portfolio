@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
 import { HeroService } from '@/app/lib/services/heroService';
+import { HeroRepository } from '@/app/lib/repositories/heroRepository';
 import { HeroSettings } from '@/app/domain/types';
 
 export default function LandingHero() {
@@ -15,7 +16,9 @@ export default function LandingHero() {
   useEffect(() => {
     async function fetchSettings() {
       try {
-        const data = await HeroService.getSettings(supabase);
+        const repository = new HeroRepository(supabase);
+        const service = new HeroService(repository);
+        const data = await service.getSettings();
         setSettings(data);
       } catch (error) {
         console.error('Error fetching hero settings:', error);

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { HeroService } from '@/app/lib/services/heroService';
+import { HeroRepository } from '@/app/lib/repositories/heroRepository';
 import { HeroSettings } from '@/app/domain/types';
 import ImageUploader from './ImageUploader';
 import { Facebook, Instagram, Linkedin, MessageCircle, X, Loader2 } from 'lucide-react';
@@ -16,7 +17,9 @@ export default function HeroEditor() {
   useEffect(() => {
     async function loadSettings() {
       try {
-        const data = await HeroService.getSettings(supabase);
+        const repository = new HeroRepository(supabase);
+        const service = new HeroService(repository);
+        const data = await service.getSettings();
         setSettings(data);
       } catch (error) {
         console.error('Error loading hero settings:', error);
@@ -31,7 +34,9 @@ export default function HeroEditor() {
     if (!settings) return;
     setSaving(true);
     try {
-      await HeroService.updateSettings(supabase, settings);
+      const repository = new HeroRepository(supabase);
+      const service = new HeroService(repository);
+      await service.updateSettings(settings);
       alert('Hero settings saved successfully!');
     } catch (error) {
       console.error('Error saving hero settings:', error);

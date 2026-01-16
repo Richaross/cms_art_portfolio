@@ -1,58 +1,13 @@
+[@sentry/nextjs] DEPRECATION WARNING: disableLogger is deprecated and will be removed in a future version. Use webpack.treeshake.removeDebugLogging instead.
+[@sentry/nextjs] DEPRECATION WARNING: automaticVercelMonitors is deprecated and will be removed in a future version. Use webpack.automaticVercelMonitors instead.
+[@sentry/nextjs] DEPRECATION WARNING: reactComponentAnnotation is deprecated and will be removed in a future version. Use webpack.reactComponentAnnotation instead.
+PASS components/cms/__tests__/NewsEditor.test.tsx
+  NewsEditor
+    √ should render mapped news posts without crashing (65 ms)
+    √ should show empty state when no posts are returned (11 ms)
 
-> app@0.1.0 test
-> jest
-
-PASS lib/__tests__/cloudinaryHelper.test.ts
-PASS components/__tests__/Navbar.test.tsx
-PASS components/cms/__tests__/SectionEditor.test.tsx
-FAIL e2e/smoke.spec.ts
-  ● Test suite failed to run
-
-    ReferenceError: TransformStream is not defined
-
-    [0m [90m 3 |[39m test([32m'landing page loads and displays portfolio grid'[39m[33m,[39m [36masync[39m ({ page }) [33m=>[39m {
-     [90m 4 |[39m     [90m// 1. Visit the home page[39m
-    [31m[1m>[22m[39m[90m 5 |[39m     [36mawait[39m page[33m.[39mgoto([32m'http://localhost:3000'[39m)[33m;[39m
-     [90m   |[39m               [31m[1m^[22m[39m
-     [90m 6 |[39m
-     [90m 7 |[39m     [90m// 2. Check for the main title or logo[39m
-     [90m 8 |[39m     [36mawait[39m expect(page[33m.[39mgetByText([32m'ArtPortfolio'[39m))[33m.[39mtoBeVisible()[33m;[39m[0m
-
-      at Object.<anonymous> (node_modules/playwright/lib/mcpBundleImpl.js:17:5390)
-      at Object.<anonymous> (node_modules/playwright/lib/mcp/sdk/bundle.js:48:22)
-      at Object.<anonymous> (node_modules/playwright/lib/mcp/sdk/server.js:40:25)
-      at Object.<anonymous> (node_modules/playwright/lib/mcp/browser/config.js:50:21)
-      at Object.<anonymous> (node_modules/playwright/lib/mcp/test/browserBackend.js:24:21)
-      at Object.<anonymous> (node_modules/playwright/lib/index.js:45:29)
-      at Object.<anonymous> (node_modules/playwright/test.js:17:13)
-      at Object.<anonymous> (node_modules/@playwright/test/index.js:17:18)
-      at Object.<anonymous> (e2e/smoke.spec.ts:5:15)
-
-FAIL e2e/example.spec.ts
-  ● Test suite failed to run
-
-    ReferenceError: TransformStream is not defined
-
-    [0m [90m 3 |[39m test([32m'has title'[39m[33m,[39m [36masync[39m ({ page }) [33m=>[39m {
-     [90m 4 |[39m   [36mawait[39m page[33m.[39mgoto([32m'https://playwright.dev/'[39m)[33m;[39m
-    [31m[1m>[22m[39m[90m 5 |[39m
-     [90m   |[39m [31m[1m^[22m[39m
-     [90m 6 |[39m   [90m// Expect a title "to contain" a substring.[39m
-     [90m 7 |[39m   [36mawait[39m expect(page)[33m.[39mtoHaveTitle([35m/Playwright/[39m)[33m;[39m
-     [90m 8 |[39m })[33m;[39m[0m
-
-      at Object.<anonymous> (node_modules/playwright/lib/mcpBundleImpl.js:17:5390)
-      at Object.<anonymous> (node_modules/playwright/lib/mcp/sdk/bundle.js:48:22)
-      at Object.<anonymous> (node_modules/playwright/lib/mcp/sdk/server.js:40:25)
-      at Object.<anonymous> (node_modules/playwright/lib/mcp/browser/config.js:50:21)
-      at Object.<anonymous> (node_modules/playwright/lib/mcp/test/browserBackend.js:24:21)
-      at Object.<anonymous> (node_modules/playwright/lib/index.js:45:29)
-      at Object.<anonymous> (node_modules/playwright/test.js:17:13)
-      at Object.<anonymous> (node_modules/@playwright/test/index.js:17:18)
-      at Object.<anonymous> (e2e/example.spec.ts:5:15)
-
-Test Suites: 2 failed, 3 passed, 5 total
-Tests:       14 passed, 14 total
+Test Suites: 1 passed, 1 total
+Tests:       2 passed, 2 total
 Snapshots:   0 total
-Time:        3.893 s
-Ran all test suites.
+Time:        2.116 s
+Ran all test suites matching components/cms/__tests__/NewsEditor.test.tsx.

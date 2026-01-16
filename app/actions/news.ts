@@ -2,21 +2,28 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { NewsService } from '@/app/lib/services/newsService';
+import { NewsRepository } from '@/app/lib/repositories/newsRepository';
 import { CloudinaryService } from '@/app/lib/services/cloudinaryService';
 import { NewsPost } from '@/app/domain/types';
 import { revalidatePath } from 'next/cache';
 
-export async function getNewsPosts(): Promise<NewsPost[]> {
+async function getNewsService() {
   const supabase = await createClient();
-  return NewsService.getAll(supabase);
+  const repository = new NewsRepository(supabase);
+  return new NewsService(repository);
+}
+
+export async function getNewsPosts(): Promise<NewsPost[]> {
+  const service = await getNewsService();
+  return service.getAll();
 }
 
 export async function saveNewsPost(
   post: Partial<NewsPost>
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = await createClient();
+  const service = await getNewsService();
   try {
-    await NewsService.upsert(supabase, post);
+    await service.upsert(post);
     revalidatePath('/dashboard');
     revalidatePath('/'); // Revalidate main page/news section
     return { success: true };
@@ -30,7 +37,7 @@ export async function deleteNewsPost(
   id: string,
   imageUrl?: string | null
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = await createClient();
+  const service = await getNewsService();
   try {
     // 1. Delete image from Cloudinary if needed
     if (imageUrl) {
@@ -38,7 +45,7 @@ export async function deleteNewsPost(
     }
 
     // 2. Delete from DB
-    await NewsService.delete(supabase, id);
+    await service.delete(id);
 
     revalidatePath('/dashboard');
     revalidatePath('/');

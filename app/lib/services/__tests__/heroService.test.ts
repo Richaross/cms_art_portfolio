@@ -1,16 +1,11 @@
-import { SupabaseClient } from '@supabase/supabase-js';
 import { HeroService } from '@/app/lib/services/heroService';
+import { IHeroRepository } from '@/app/domain/repositoryInterfaces';
 import { HeroSettings } from '@/app/domain/types';
 
-const mockSupabase = {
-  from: jest.fn().mockReturnThis(),
-  select: jest.fn().mockReturnThis(),
-  upsert: jest.fn().mockReturnThis(),
-  eq: jest.fn().mockReturnThis(),
-  single: jest.fn(),
-} as unknown as SupabaseClient;
-
 describe('HeroService', () => {
+  let heroService: HeroService;
+  let mockRepository: jest.Mocked<IHeroRepository>;
+
   const mockSettings: HeroSettings = {
     id: 1,
     bgImageUrl: 'http://example.com/bg.jpg',
@@ -32,64 +27,29 @@ describe('HeroService', () => {
     },
   };
 
-  const dbRow = {
-    id: 1,
-    bg_image_url: 'http://example.com/bg.jpg',
-    title: 'Test Title',
-    dim_intensity: 0.4,
-    social_links: {
-      instagram: true,
-      linkedin: true,
-      facebook: false,
-      whatsapp: false,
-      x: false,
-    },
-    social_urls: {
-      instagram: 'insta',
-      linkedin: 'linked',
-      facebook: '',
-      whatsapp: '',
-      x: '',
-    },
-  };
-
   beforeEach(() => {
-    jest.clearAllMocks();
+    mockRepository = {
+      getSettings: jest.fn(),
+      updateSettings: jest.fn(),
+    };
+    heroService = new HeroService(mockRepository);
   });
 
-  it('should fetch hero settings', async () => {
-    const singleMock = jest.fn().mockResolvedValue({
-      data: dbRow,
-      error: null,
-    });
+  it('should fetch hero settings from repository', async () => {
+    mockRepository.getSettings.mockResolvedValue(mockSettings);
 
-    (mockSupabase.from as jest.Mock).mockReturnValue({
-      select: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
-      single: singleMock,
-    });
-
-    const result = await HeroService.getSettings(mockSupabase);
+    const result = await heroService.getSettings();
 
     expect(result).toEqual(mockSettings);
-    expect(mockSupabase.from).toHaveBeenCalledWith('hero_settings');
+    expect(mockRepository.getSettings).toHaveBeenCalled();
   });
 
-  it('should update hero settings', async () => {
-    const singleMock = jest.fn().mockResolvedValue({
-      data: dbRow,
-      error: null,
-    });
+  it('should update hero settings via repository', async () => {
+    mockRepository.updateSettings.mockResolvedValue(mockSettings);
 
-    (mockSupabase.from as jest.Mock).mockReturnValue({
-      upsert: jest.fn().mockReturnThis(),
-      select: jest.fn().mockReturnThis(),
-      single: singleMock,
-    });
-
-    const result = await HeroService.updateSettings(mockSupabase, mockSettings);
+    const result = await heroService.updateSettings(mockSettings);
 
     expect(result).toEqual(mockSettings);
-    expect(mockSupabase.from).toHaveBeenCalledWith('hero_settings');
+    expect(mockRepository.updateSettings).toHaveBeenCalledWith(mockSettings);
   });
 });

@@ -1,31 +1,15 @@
-import { SupabaseClient } from '@supabase/supabase-js';
-import { Database } from '@/types/database';
 import { AboutInfo } from '@/app/domain/types';
+import { IAboutRepository } from '@/app/domain/repositoryInterfaces';
+import { IAboutService } from '@/app/domain/serviceInterfaces';
 
-export class AboutService {
-  static async get(supabase: SupabaseClient<Database>): Promise<AboutInfo | null> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any).from('about_info').select('*').single();
+export class AboutService implements IAboutService {
+  constructor(private repository: IAboutRepository) {}
 
-    if (error || !data) return null;
-
-    const row = data as Database['public']['Tables']['about_info']['Row'];
-    return {
-      id: row.id,
-      description: row.description,
-      portraitUrl: row.portrait_url,
-    };
+  async get(): Promise<AboutInfo | null> {
+    return this.repository.get();
   }
 
-  static async upsert(supabase: SupabaseClient<Database>, info: Partial<AboutInfo>): Promise<void> {
-    const dbRow: Database['public']['Tables']['about_info']['Insert'] = {
-      id: info.id || 1, // Default ID concept
-      description: info.description,
-      portrait_url: info.portraitUrl,
-    };
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any).from('about_info').upsert(dbRow);
-    if (error) throw error;
+  async upsert(info: Partial<AboutInfo>): Promise<void> {
+    await this.repository.upsert(info);
   }
 }
