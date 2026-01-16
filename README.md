@@ -178,7 +178,15 @@ Based on the latest report, the following critical steps were identified and hav
 
 ### 6. Phase 2: Advanced CMS Features 🔮
 
-- **Drag & Drop**: Reorder portfolio items and news posts.
-- **Rich Text**: Enhanced editor for news and about sections.
-- **Media Library**: Better management of uploaded assets.
-- **Analytics**: Dashboard for tracking portfolio engagement.
+- **Portfolio Reordering (Drag & Drop)**:
+  - Manual sorting of Collections on the landing page.
+  - Manual sorting of Items within each Collection.
+- **Enhanced Content Editor**:
+  - Support for **Hyperlinks** and basic formatting in descriptions.
+  - Draft vs. Published status for News and Portfolio items.
+  - Scheduled posting for News content.
+- **Media Library & Asset Management**:
+  - Centralized image library with asset reuse (e.g., use item image as collection cover).
+  - Integrated **Image Cropping** and Alt-Text management for SEO.
+- **Artist Analytics (TBD)**:
+  - Dashboard for tracking artwork views and site engagement.

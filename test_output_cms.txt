@@ -1,6 +1,6 @@
 
 > app@0.1.0 test
-> jest components/cms/__tests__/AboutEditor.test.tsx components/cms/__tests__/HeroEditor.test.tsx
+> jest components/cms/__tests__
 
 [@sentry/nextjs] DEPRECATION WARNING: disableLogger is deprecated and will be removed in a future version. Use webpack.treeshake.removeDebugLogging instead.
 [@sentry/nextjs] DEPRECATION WARNING: automaticVercelMonitors is deprecated and will be removed in a future version. Use webpack.automaticVercelMonitors instead.
@@ -37,8 +37,11 @@ FAIL components/cms/__tests__/HeroEditor.test.tsx
       at Resolver._throwModNotFoundError (node_modules/jest-resolve/build/index.js:863:11)
       at Object.mock (components/cms/__tests__/HeroEditor.test.tsx:8:6)
 
-Test Suites: 2 failed, 2 total
-Tests:       0 total
+PASS components/cms/__tests__/SectionEditor.test.tsx
+PASS components/cms/__tests__/NewsEditor.test.tsx
+
+Test Suites: 2 failed, 2 passed, 4 total
+Tests:       9 passed, 9 total
 Snapshots:   0 total
-Time:        2.296 s
-Ran all test suites matching components/cms/__tests__/AboutEditor.test.tsx|components/cms/__tests__/HeroEditor.test.tsx.
+Time:        3.542 s
+Ran all test suites matching components/cms/__tests__.
