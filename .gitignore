@@ -62,6 +62,23 @@ node_modules/
 
 # Turbopack/Turbo
 .turbo/
+.swc/
 
 # Logs
 *.log
+*.txt
+*_log.txt
+*_errors.txt
+*_output.txt
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Build artifacts and caches
+.next/
+/out/
+/build
+*.tsbuildinfo
+next-env.d.ts
+.eslintcache
