@@ -38,6 +38,8 @@ export async function verifyPortfolioService() {
       stripeLink: null,
       isSaleActive: true,
       orderRank: 0,
+      isPublished: true,
+      publishedAt: new Date(),
     };
     const savedItem = await service.upsertItem(item);
     log(`Item Created: ${savedItem.id}`);

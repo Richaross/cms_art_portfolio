@@ -14,6 +14,8 @@ describe('PortfolioService', () => {
     orderRank: 0,
     inventory: null,
     items: [],
+    isPublished: true,
+    publishedAt: null,
   };
 
   beforeEach(() => {
@@ -74,6 +76,8 @@ describe('PortfolioService', () => {
       isSaleActive: true,
       orderRank: 0,
       stripeLink: null,
+      isPublished: true,
+      publishedAt: null,
     };
     mockRepository.upsertItem.mockResolvedValue(mockItem);
     const result = await portfolioService.upsertItem(mockItem);

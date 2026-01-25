@@ -122,9 +122,12 @@ export default function News({ initialPosts = [] }: NewsProps) {
                   <h3 className="text-xl font-bold group-hover:underline decoration-1 underline-offset-4">
                     {post.title}
                   </h3>
-                  <p className="text-gray-400 text-sm leading-relaxed line-clamp-3">
-                    {post.summary || post.content}
-                  </p>
+                  {post.summary || post.content ? (
+                    <div
+                      className="text-gray-400 text-sm leading-relaxed line-clamp-3 prose prose-invert prose-sm [&_p]:!mb-[0.5em] [&_p]:!mt-0"
+                      dangerouslySetInnerHTML={{ __html: post.summary || post.content || '' }}
+                    />
+                  ) : null}
                 </div>
               </motion.div>
             ))
@@ -206,9 +209,12 @@ export default function News({ initialPosts = [] }: NewsProps) {
                 </div>
 
                 {/* Full Content */}
-                <div className="prose prose-invert prose-lg text-gray-300 leading-relaxed whitespace-pre-wrap">
-                  {selectedPost.content || selectedPost.summary}
-                </div>
+                <div
+                  className="prose prose-invert prose-lg text-gray-300 leading-relaxed max-w-none [&_p]:!mb-[0.5em] [&_p]:!mt-0"
+                  dangerouslySetInnerHTML={{
+                    __html: selectedPost.content || selectedPost.summary || '',
+                  }}
+                />
 
                 {/* External Link Button */}
                 {selectedPost.externalLink && (

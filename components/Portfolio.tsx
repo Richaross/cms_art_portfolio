@@ -55,6 +55,8 @@ export default function Portfolio({ initialSections = [] }: PortfolioProps) {
                 isSaleActive: row.inventory.is_sale_active,
               }
             : null,
+          isPublished: row.is_published ?? true,
+          publishedAt: row.published_at ? new Date(row.published_at) : null,
           items: (row.section_items || []).map((item) => ({
             id: item.id,
             sectionId: item.section_id,
@@ -65,6 +67,8 @@ export default function Portfolio({ initialSections = [] }: PortfolioProps) {
             stockQty: item.stock_qty || 0,
             stripeLink: item.stripe_link,
             isSaleActive: item.is_sale_active || false,
+            isPublished: item.is_published ?? true,
+            publishedAt: item.published_at ? new Date(item.published_at) : null,
             orderRank: item.order_rank || 0,
           })),
         }));
@@ -159,9 +163,10 @@ export default function Portfolio({ initialSections = [] }: PortfolioProps) {
                   {section.title || 'Untitled Collection'}
                 </h3>
                 {section.description && (
-                  <p className="text-sm text-gray-400 line-clamp-2 leading-relaxed whitespace-pre-wrap">
-                    {section.description}
-                  </p>
+                  <div
+                    className="text-sm text-gray-400 line-clamp-2 leading-relaxed prose prose-invert prose-sm [&_p]:!mb-[0.5em] [&_p]:!mt-0"
+                    dangerouslySetInnerHTML={{ __html: section.description }}
+                  />
                 )}
               </div>
             </motion.div>
@@ -199,9 +204,10 @@ export default function Portfolio({ initialSections = [] }: PortfolioProps) {
                 <h2 className="text-4xl md:text-6xl font-bold mb-6 tracking-tighter">
                   {selectedSection.title}
                 </h2>
-                <p className="text-gray-400 text-lg leading-relaxed whitespace-pre-wrap">
-                  {selectedSection.description}
-                </p>
+                <div
+                  className="text-gray-400 text-lg leading-relaxed prose prose-invert max-w-none [&_p]:!mb-[0.5em] [&_p]:!mt-0"
+                  dangerouslySetInnerHTML={{ __html: selectedSection.description || '' }}
+                />
               </div>
 
               {/* Vertical Vertical Item List */}
@@ -242,9 +248,10 @@ export default function Portfolio({ initialSections = [] }: PortfolioProps) {
                     <div className="mt-8 text-center max-w-2xl w-full">
                       <h4 className="text-2xl font-bold mb-3">{item.title}</h4>
                       {item.description && (
-                        <p className="text-gray-400 text-sm leading-relaxed whitespace-pre-wrap">
-                          {item.description}
-                        </p>
+                        <div
+                          className="text-gray-400 text-sm leading-relaxed prose prose-invert max-w-none [&_p]:!mb-[0.5em] [&_p]:!mt-0"
+                          dangerouslySetInnerHTML={{ __html: item.description }}
+                        />
                       )}
 
                       {/* Interaction Area */}

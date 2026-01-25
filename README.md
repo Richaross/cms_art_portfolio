@@ -176,15 +176,15 @@ Based on the latest report, the following critical steps were identified and hav
 - **CSP**: ✅ Jan 16. Implemented via `proxy.ts`.
 - **Env Validation**: ✅ Jan 16. Implemented using `zod`.
 
-### 6. Phase 2: Advanced CMS Features 🔮
+### 6. Phase 2: Advanced CMS Features 🚧
 
 - **Portfolio Reordering (Drag & Drop)**:
   - Manual sorting of Collections on the landing page.
   - Manual sorting of Items within each Collection.
 - **Enhanced Content Editor**:
-  - Support for **Hyperlinks** and basic formatting in descriptions.
-  - Draft vs. Published status for News and Portfolio items.
-  - Scheduled posting for News content.
+  - ✅ **Jan 25**. Support for **Hyperlinks** and basic formatting in descriptions (Tiptap).
+  - ✅ **Jan 25**. Draft vs. Published status for News and Portfolio items.
+  - ✅ **Jan 25**. Scheduled posting for News content.
 - **Media Library & Asset Management**:
   - Centralized image library with asset reuse (e.g., use item image as collection cover).
   - Integrated **Image Cropping** and Alt-Text management for SEO.

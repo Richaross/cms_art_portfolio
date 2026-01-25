@@ -20,6 +20,8 @@ describe('AboutService', () => {
         id: 1,
         description: 'Test Description',
         portraitUrl: 'http://example.com/portait.jpg',
+        isPublished: true,
+        publishedAt: new Date(),
       };
       mockRepository.get.mockResolvedValue(mockInfo);
 

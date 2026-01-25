@@ -69,6 +69,8 @@ export default function DashboardPage() {
             description: s.description,
             imgUrl: s.img_url,
             orderRank: s.order_rank,
+            isPublished: s.is_published ?? true,
+            publishedAt: s.published_at ? new Date(s.published_at) : null,
             inventory: s.inventory?.[0]
               ? {
                   sectionId: s.inventory[0].section_id,
@@ -88,6 +90,8 @@ export default function DashboardPage() {
               stockQty: item.stock_qty || 0,
               stripeLink: item.stripe_link,
               isSaleActive: item.is_sale_active || false,
+              isPublished: item.is_published ?? true,
+              publishedAt: item.published_at ? new Date(item.published_at) : null,
               orderRank: item.order_rank || 0,
             })),
           })

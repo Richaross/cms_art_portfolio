@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { SectionItem } from '@/app/domain/types';
 import ImageUploader from './ImageUploader';
+import RichTextEditor from './RichTextEditor';
 import { saveItem, deleteItem } from '@/app/actions/portfolio';
 
 interface ItemEditorProps {
@@ -23,6 +24,8 @@ export default function ItemEditor({ item, sectionId, onSave, onCancel }: ItemEd
   const [price, setPrice] = useState('0');
   const [stock, setStock] = useState('1');
   const [stripeLink, setStripeLink] = useState('');
+  const [isPublished, setIsPublished] = useState(true);
+  const [publishedAt, setPublishedAt] = useState<Date | null>(null);
 
   useEffect(() => {
     if (item) {
@@ -33,6 +36,8 @@ export default function ItemEditor({ item, sectionId, onSave, onCancel }: ItemEd
       setPrice(item.price?.toString() || '0');
       setStock(item.stockQty?.toString() || '1');
       setStripeLink(item.stripeLink || '');
+      setIsPublished(item.isPublished ?? true);
+      setPublishedAt(item.publishedAt || null);
     } else {
       setTitle('');
       setDescription('');
@@ -41,6 +46,8 @@ export default function ItemEditor({ item, sectionId, onSave, onCancel }: ItemEd
       setPrice('0');
       setStock('1');
       setStripeLink('');
+      setIsPublished(true);
+      setPublishedAt(null);
     }
   }, [item]);
 
@@ -50,7 +57,7 @@ export default function ItemEditor({ item, sectionId, onSave, onCancel }: ItemEd
 
     try {
       const itemData: SectionItem = {
-        id: item?.id || '', // Empty for new
+        id: item?.id || '',
         sectionId: sectionId,
         title,
         description,
@@ -59,6 +66,8 @@ export default function ItemEditor({ item, sectionId, onSave, onCancel }: ItemEd
         price: parseFloat(price) || 0,
         stockQty: parseInt(stock) || 0,
         stripeLink,
+        isPublished,
+        publishedAt: isPublished ? publishedAt || new Date() : null,
         orderRank: item?.orderRank || 0,
       };
 
@@ -110,11 +119,7 @@ export default function ItemEditor({ item, sectionId, onSave, onCancel }: ItemEd
 
         <div>
           <label className="block text-xs uppercase text-gray-400 mb-1">Description</label>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="w-full bg-black/50 border border-white/10 rounded p-2 h-20"
-          />
+          <RichTextEditor content={description} onChange={setDescription} />
         </div>
 
         <ImageUploader label="Item Image" value={imageUrl} onChange={setImageUrl} />

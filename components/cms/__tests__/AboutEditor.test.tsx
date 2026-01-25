@@ -28,6 +28,26 @@ jest.mock('../ImageUploader', () => {
   };
 });
 
+jest.mock('../RichTextEditor', () => {
+  return function MockRichTextEditor({
+    content,
+    onChange,
+  }: {
+    content: string;
+    onChange: (val: string) => void;
+  }) {
+    return (
+      <div data-testid="rich-text-editor">
+        <textarea
+          data-testid="rich-text-input"
+          value={content}
+          onChange={(e) => onChange(e.target.value)}
+        />
+      </div>
+    );
+  };
+});
+
 // Mock window.alert
 const mockAlert = jest.fn();
 window.alert = mockAlert;
@@ -37,6 +57,8 @@ describe('AboutEditor Component', () => {
     id: 1,
     description: 'Original Bio',
     portraitUrl: 'original-portrait.jpg',
+    isPublished: true,
+    publishedAt: null,
   };
 
   beforeEach(() => {
@@ -49,7 +71,7 @@ describe('AboutEditor Component', () => {
 
     await waitFor(() => {
       expect(getAboutInfo).toHaveBeenCalled();
-      expect(screen.getByPlaceholderText(/Write your story here/i)).toHaveValue('Original Bio');
+      expect(screen.getByTestId('rich-text-input')).toHaveValue('Original Bio');
       expect(screen.getByTestId('image-input')).toHaveValue('original-portrait.jpg');
     });
   });
@@ -59,14 +81,14 @@ describe('AboutEditor Component', () => {
 
     await waitFor(() => expect(getAboutInfo).toHaveBeenCalled());
 
-    fireEvent.change(screen.getByPlaceholderText(/Write your story here/i), {
+    fireEvent.change(screen.getByTestId('rich-text-input'), {
       target: { value: 'Updated Bio' },
     });
     fireEvent.change(screen.getByTestId('image-input'), {
       target: { value: 'new-portrait.jpg' },
     });
 
-    expect(screen.getByPlaceholderText(/Write your story here/i)).toHaveValue('Updated Bio');
+    expect(screen.getByTestId('rich-text-input')).toHaveValue('Updated Bio');
     expect(screen.getByTestId('image-input')).toHaveValue('new-portrait.jpg');
   });
 
@@ -77,7 +99,7 @@ describe('AboutEditor Component', () => {
 
     await waitFor(() => expect(getAboutInfo).toHaveBeenCalled());
 
-    fireEvent.change(screen.getByPlaceholderText(/Write your story here/i), {
+    fireEvent.change(screen.getByTestId('rich-text-input'), {
       target: { value: 'New Bio content' },
     });
 
@@ -93,6 +115,8 @@ describe('AboutEditor Component', () => {
         id: 1,
         description: 'New Bio content',
         portraitUrl: 'new-profile.jpg',
+        isPublished: true,
+        publishedAt: expect.anything(), // Accept any date or null since logic might set it on save
       });
       expect(mockAlert).toHaveBeenCalledWith('About info updated!');
     });

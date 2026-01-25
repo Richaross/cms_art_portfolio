@@ -43,9 +43,10 @@ export default function About({ initialData }: AboutProps) {
           transition={{ duration: 0.8 }}
         >
           <h2 className="text-5xl md:text-6xl font-bold mb-8 tracking-tight">About</h2>
-          <div className="text-base md:text-lg text-gray-400 leading-relaxed font-sans whitespace-pre-wrap">
-            {description}
-          </div>
+          <div
+            className="text-base md:text-lg text-gray-400 leading-relaxed font-sans prose prose-invert max-w-none [&_p]:!mb-[0.5em] [&_p]:!mt-0"
+            dangerouslySetInnerHTML={{ __html: description }}
+          />
         </motion.div>
 
         {/* Portrait Image (Right Side) */}

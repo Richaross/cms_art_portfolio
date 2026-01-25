@@ -22,12 +22,7 @@ export class PortfolioRepository implements IPortfolioRepository {
     if (error) throw error;
     if (!data) return [];
 
-    type PortfolioSectionRow = Database['public']['Tables']['sections']['Row'] & {
-      inventory: Database['public']['Tables']['inventory']['Row'] | null;
-      section_items: Database['public']['Tables']['section_items']['Row'][];
-    };
-
-    return (data as unknown as PortfolioSectionRow[]).map((row) => this.mapToDomain(row));
+    return data.map((row) => this.mapToDomain(row));
   }
 
   async getById(id: string): Promise<PortfolioSection | null> {
@@ -57,17 +52,14 @@ export class PortfolioRepository implements IPortfolioRepository {
       description: section.description,
       img_url: section.imgUrl,
       order_rank: section.orderRank || 0,
+      is_published: section.isPublished,
+      published_at: section.publishedAt?.toISOString(),
     };
 
-    const { data, error } = await this.supabase
-      .from('sections' as never)
-      .upsert(dbRow as never)
-      .select()
-      .single();
+    const { data, error } = await this.supabase.from('sections').upsert(dbRow).select().single();
 
     if (error) throw error;
-    const row = data as Database['public']['Tables']['sections']['Row'];
-    return { id: row.id };
+    return { id: data.id };
   }
 
   async upsertInventory(inventory: InventoryItem): Promise<void> {
@@ -78,8 +70,7 @@ export class PortfolioRepository implements IPortfolioRepository {
       stripe_link: inventory.stripeLink,
       is_sale_active: inventory.isSaleActive,
     };
-
-    const { error } = await this.supabase.from('inventory' as never).upsert(dbRow as never);
+    const { error } = await this.supabase.from('inventory').upsert(dbRow);
     if (error) throw error;
   }
 
@@ -95,11 +86,13 @@ export class PortfolioRepository implements IPortfolioRepository {
       stripe_link: item.stripeLink,
       is_sale_active: item.isSaleActive,
       order_rank: item.orderRank,
+      is_published: item.isPublished,
+      published_at: item.publishedAt?.toISOString(),
     };
 
     const { data, error } = await this.supabase
-      .from('section_items' as never)
-      .upsert(dbRow as never)
+      .from('section_items')
+      .upsert(dbRow)
       .select()
       .single();
 
@@ -130,6 +123,8 @@ export class PortfolioRepository implements IPortfolioRepository {
       description: row.description,
       imgUrl: row.img_url,
       orderRank: row.order_rank,
+      isPublished: row.is_published,
+      publishedAt: row.published_at ? new Date(row.published_at) : null,
       inventory: row.inventory
         ? {
             sectionId: row.inventory.section_id,
@@ -155,6 +150,8 @@ export class PortfolioRepository implements IPortfolioRepository {
       stripeLink: row.stripe_link,
       isSaleActive: row.is_sale_active || false,
       orderRank: row.order_rank || 0,
+      isPublished: row.is_published,
+      publishedAt: row.published_at ? new Date(row.published_at) : null,
     };
   }
 }

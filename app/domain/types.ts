@@ -18,6 +18,8 @@ export interface PortfolioSection {
   description: string | null;
   imgUrl: string | null;
   orderRank: number;
+  isPublished: boolean;
+  publishedAt: Date | null;
   // Relations
   items?: SectionItem[];
   inventory?: InventoryItem | null; // Keeping for backward compat logic if needed, but moving towards items
@@ -34,6 +36,8 @@ export interface SectionItem {
   stripeLink: string | null;
   isSaleActive: boolean;
   orderRank: number;
+  isPublished: boolean;
+  publishedAt: Date | null;
 }
 
 export interface InventoryItem {
@@ -48,6 +52,8 @@ export interface AboutInfo {
   id: number;
   description: string | null;
   portraitUrl: string | null;
+  isPublished: boolean;
+  publishedAt: Date | null;
 }
 
 export interface HeroSettings {

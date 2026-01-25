@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { PortfolioSection, SectionItem } from '@/app/domain/types';
 import ImageUploader from './ImageUploader';
 import ItemEditor from './ItemEditor';
+import RichTextEditor from './RichTextEditor';
 import { saveSection, deleteSection } from '@/app/actions/portfolio';
 import { Plus, Edit2, GripVertical } from 'lucide-react'; // Assuming lucide-react is available
 
@@ -21,6 +22,8 @@ export default function SectionEditor({ section, onSave, onCancel }: SectionEdit
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [imgUrl, setImgUrl] = useState('');
+  const [isPublished, setIsPublished] = useState(true);
+  const [publishedAt, setPublishedAt] = useState<Date | null>(null);
 
   // Item Editing State
   const [editingItem, setEditingItem] = useState<SectionItem | null>(null);
@@ -32,10 +35,14 @@ export default function SectionEditor({ section, onSave, onCancel }: SectionEdit
       setTitle(section.title || '');
       setDescription(section.description || '');
       setImgUrl(section.imgUrl || '');
+      setIsPublished(section.isPublished ?? true);
+      setPublishedAt(section.publishedAt || null);
     } else {
       setTitle('');
       setDescription('');
       setImgUrl('');
+      setIsPublished(true);
+      setPublishedAt(null);
     }
   }, [section]);
 
@@ -48,6 +55,8 @@ export default function SectionEditor({ section, onSave, onCancel }: SectionEdit
         title,
         description,
         imgUrl,
+        isPublished,
+        publishedAt: isPublished ? publishedAt || new Date() : null,
         orderRank: section?.orderRank || 0,
         ...(section?.id ? { id: section.id } : {}),
       };
@@ -174,12 +183,7 @@ export default function SectionEditor({ section, onSave, onCancel }: SectionEdit
               <label htmlFor="description" className="block text-sm font-medium mb-1">
                 Description
               </label>
-              <textarea
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="w-full bg-black/50 border border-white/10 rounded p-2 h-24"
-              />
+              <RichTextEditor content={description} onChange={setDescription} />
             </div>
 
             <ImageUploader label="Cover Image" value={imgUrl} onChange={setImgUrl} />

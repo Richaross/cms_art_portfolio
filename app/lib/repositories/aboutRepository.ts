@@ -7,16 +7,16 @@ export class AboutRepository implements IAboutRepository {
   constructor(private supabase: SupabaseClient<Database>) {}
 
   async get(): Promise<AboutInfo | null> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (this.supabase as any).from('about_info').select('*').single();
+    const { data, error } = await this.supabase.from('about_info').select('*').single();
 
     if (error || !data) return null;
 
-    const row = data as Database['public']['Tables']['about_info']['Row'];
     return {
-      id: row.id,
-      description: row.description,
-      portraitUrl: row.portrait_url,
+      id: data.id,
+      description: data.description,
+      portraitUrl: data.portrait_url,
+      isPublished: data.is_published,
+      publishedAt: data.published_at ? new Date(data.published_at) : null,
     };
   }
 
@@ -25,10 +25,11 @@ export class AboutRepository implements IAboutRepository {
       id: info.id || 1,
       description: info.description,
       portrait_url: info.portraitUrl,
+      is_published: info.isPublished,
+      published_at: info.publishedAt?.toISOString(),
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (this.supabase as any).from('about_info').upsert(dbRow);
+    const { error } = await this.supabase.from('about_info').upsert(dbRow);
     if (error) throw error;
   }
 }

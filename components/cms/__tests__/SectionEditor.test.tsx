@@ -42,6 +42,26 @@ jest.mock('../ItemEditor', () => {
   };
 });
 
+jest.mock('../RichTextEditor', () => {
+  return function MockRichTextEditor({
+    content,
+    onChange,
+  }: {
+    content: string;
+    onChange: (val: string) => void;
+  }) {
+    return (
+      <div data-testid="rich-text-editor">
+        <textarea
+          data-testid="rich-text-input"
+          value={content}
+          onChange={(e) => onChange(e.target.value)}
+        />
+      </div>
+    );
+  };
+});
+
 // Mock window.alert and window.confirm
 const mockAlert = jest.fn();
 const mockConfirm = jest.fn();
@@ -57,6 +77,8 @@ const mockSection: PortfolioSection = {
   imgUrl: 'test.jpg',
   orderRank: 1,
   items: [],
+  isPublished: true,
+  publishedAt: null,
 };
 
 describe('SectionEditor Component', () => {
@@ -89,7 +111,8 @@ describe('SectionEditor Component', () => {
     fireEvent.change(screen.getByRole('textbox', { name: /collection title/i }), {
       target: { value: 'New Masterpiece' },
     });
-    fireEvent.change(screen.getByRole('textbox', { name: /description/i }), {
+    // Updated to target mock RichTextEditor input
+    fireEvent.change(screen.getByTestId('rich-text-input'), {
       target: { value: 'My best work' },
     });
 

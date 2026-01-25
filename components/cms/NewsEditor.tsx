@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Trash2, Plus, Edit } from 'lucide-react';
 import { format } from 'date-fns';
 import ImageUploader from './ImageUploader';
+import RichTextEditor from './RichTextEditor';
 
 import { getNewsPosts, saveNewsPost, deleteNewsPost } from '@/app/actions/news';
 import { NewsPost } from '@/app/domain/types';
@@ -192,22 +193,14 @@ function NewsPostForm({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Summary (Short)</label>
-          <textarea
-            value={summary}
-            onChange={(e) => setSummary(e.target.value)}
-            className="w-full bg-black/50 border border-white/10 rounded p-2 h-20 text-sm"
-            placeholder="A brief teaser for the card view..."
-          />
+          <label className="block text-sm font-medium mb-1">Summary</label>
+          <RichTextEditor content={summary} onChange={setSummary} />
+          <p className="text-xs text-gray-400 mt-1">Brief overview for the news feed.</p>
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Main Content</label>
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className="w-full bg-black/50 border border-white/10 rounded p-2 h-32"
-          />
+          <label className="block text-sm font-medium mb-1">Content</label>
+          <RichTextEditor content={content} onChange={setContent} />
         </div>
 
         <div>

@@ -1,0 +1,69 @@
+.editor-container {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+.editor-toolbar {
+  padding: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.toolbar-button {
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #999;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toolbar-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.toolbar-button.is-active {
+  background-color: #fff;
+  color: #000;
+}
+
+.editor-content {
+  padding: 12px;
+  min-height: 150px;
+}
+
+.editor-content .ProseMirror {
+  outline: none;
+}
+
+.editor-content .ProseMirror p {
+  margin-bottom: 0.5em;
+}
+
+.editor-content .ProseMirror a {
+  color: #3b82f6;
+  text-decoration: underline;
+}
+
+.editor-content .ProseMirror ul {
+  list-style-type: disc;
+  padding-left: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+.editor-content .ProseMirror ol {
+  list-style-type: decimal;
+  padding-left: 1.5em;
+  margin-bottom: 0.5em;
+}

@@ -1,158 +1,197 @@
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
-export interface Database {
+export type Database = {
   public: {
     Tables: {
-      sections: {
+      about_info: {
         Row: {
-          id: string;
           created_at: string;
-          img_url: string | null;
           description: string | null;
-          title: string | null;
-          order_rank: number;
+          id: number;
+          is_published: boolean;
+          portrait_url: string | null;
+          published_at: string;
         };
         Insert: {
-          id?: string;
           created_at?: string;
-          img_url?: string | null;
           description?: string | null;
-          title?: string | null;
-          order_rank: number;
+          id?: number;
+          is_published?: boolean;
+          portrait_url?: string | null;
+          published_at?: string;
         };
         Update: {
-          id?: string;
           created_at?: string;
-          img_url?: string | null;
           description?: string | null;
-          title?: string | null;
-          order_rank?: number;
+          id?: number;
+          is_published?: boolean;
+          portrait_url?: string | null;
+          published_at?: string;
         };
+        Relationships: [];
       };
       inventory: {
         Row: {
+          is_sale_active: boolean;
+          price: number | null;
           section_id: string;
           stock_qty: number;
-          price: number | null;
           stripe_link: string | null;
-          is_sale_active: boolean;
         };
         Insert: {
+          is_sale_active?: boolean;
+          price?: number | null;
           section_id: string;
           stock_qty?: number;
-          price?: number | null;
           stripe_link?: string | null;
-          is_sale_active?: boolean;
         };
         Update: {
+          is_sale_active?: boolean;
+          price?: number | null;
           section_id?: string;
           stock_qty?: number;
-          price?: number | null;
           stripe_link?: string | null;
-          is_sale_active?: boolean;
         };
-      };
-      about_info: {
-        Row: {
-          id: number;
-          created_at: string;
-          description: string | null;
-          portrait_url: string | null;
-        };
-        Insert: {
-          id?: number;
-          created_at?: string;
-          description?: string | null;
-          portrait_url?: string | null;
-        };
-        Update: {
-          id?: number;
-          created_at?: string;
-          description?: string | null;
-          portrait_url?: string | null;
-        };
+        Relationships: [
+          {
+            foreignKeyName: 'inventory_section_id_fkey';
+            columns: ['section_id'];
+            isOneToOne: true;
+            referencedRelation: 'sections';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       news_posts: {
         Row: {
-          id: string;
-          created_at: string;
-          title: string;
+          category: string | null;
           content: string | null;
+          created_at: string;
+          external_link: string | null;
+          id: string;
           image_url: string | null;
-          is_published: boolean | null;
+          is_published: boolean;
           published_at: string | null;
           summary: string | null;
-          category: string | null;
-          external_link: string | null;
+          title: string;
           updated_at: string | null;
         };
         Insert: {
-          id?: string;
-          created_at?: string;
-          title: string;
+          category?: string | null;
           content?: string | null;
+          created_at?: string;
+          external_link?: string | null;
+          id?: string;
           image_url?: string | null;
-          is_published?: boolean | null;
+          is_published?: boolean;
           published_at?: string | null;
           summary?: string | null;
-          category?: string | null;
-          external_link?: string | null;
+          title: string;
           updated_at?: string | null;
         };
         Update: {
-          id?: string;
-          created_at?: string;
-          title?: string;
+          category?: string | null;
           content?: string | null;
+          created_at?: string;
+          external_link?: string | null;
+          id?: string;
           image_url?: string | null;
-          is_published?: boolean | null;
+          is_published?: boolean;
           published_at?: string | null;
           summary?: string | null;
-          category?: string | null;
-          external_link?: string | null;
+          title?: string;
           updated_at?: string | null;
         };
+        Relationships: [];
       };
       section_items: {
         Row: {
-          id: string;
           created_at: string;
-          section_id: string;
-          title: string | null;
           description: string | null;
+          id: string;
           image_url: string | null;
-          price: number | null;
-          stock_qty: number | null;
-          stripe_link: string | null;
+          is_published: boolean;
           is_sale_active: boolean | null;
           order_rank: number | null;
+          price: number | null;
+          published_at: string;
+          section_id: string;
+          stock_qty: number | null;
+          stripe_link: string | null;
+          title: string | null;
         };
         Insert: {
-          id?: string;
           created_at?: string;
-          section_id: string;
-          title?: string | null;
           description?: string | null;
+          id?: string;
           image_url?: string | null;
-          price?: number | null;
-          stock_qty?: number | null;
-          stripe_link?: string | null;
+          is_published?: boolean;
           is_sale_active?: boolean | null;
           order_rank?: number | null;
+          price?: number | null;
+          published_at?: string;
+          section_id: string;
+          stock_qty?: number | null;
+          stripe_link?: string | null;
+          title?: string | null;
         };
         Update: {
-          id?: string;
           created_at?: string;
-          section_id?: string;
-          title?: string | null;
           description?: string | null;
+          id?: string;
           image_url?: string | null;
-          price?: number | null;
-          stock_qty?: number | null;
-          stripe_link?: string | null;
+          is_published?: boolean;
           is_sale_active?: boolean | null;
           order_rank?: number | null;
+          price?: number | null;
+          published_at?: string;
+          section_id?: string;
+          stock_qty?: number | null;
+          stripe_link?: string | null;
+          title?: string | null;
         };
+        Relationships: [
+          {
+            foreignKeyName: 'section_items_section_id_fkey';
+            columns: ['section_id'];
+            isOneToOne: false;
+            referencedRelation: 'sections';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      sections: {
+        Row: {
+          created_at: string;
+          description: string | null;
+          id: string;
+          img_url: string | null;
+          is_published: boolean;
+          order_rank: number;
+          published_at: string;
+          title: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          description?: string | null;
+          id?: string;
+          img_url?: string | null;
+          is_published?: boolean;
+          order_rank: number;
+          published_at?: string;
+          title?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          description?: string | null;
+          id?: string;
+          img_url?: string | null;
+          is_published?: boolean;
+          order_rank?: number;
+          published_at?: string;
+          title?: string | null;
+        };
+        Relationships: [];
       };
     };
     Views: {
@@ -168,4 +207,4 @@ export interface Database {
       [_ in never]: never;
     };
   };
-}
+};
