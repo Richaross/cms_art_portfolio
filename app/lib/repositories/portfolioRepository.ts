@@ -111,6 +111,20 @@ export class PortfolioRepository implements IPortfolioRepository {
     if (error) throw error;
   }
 
+  async updateSectionOrder(items: { id: string; orderRank: number }[]): Promise<void> {
+    const updates = items.map((item) =>
+      this.supabase.from('sections').update({ order_rank: item.orderRank }).eq('id', item.id)
+    );
+    await Promise.all(updates);
+  }
+
+  async updateItemOrder(items: { id: string; orderRank: number }[]): Promise<void> {
+    const updates = items.map((item) =>
+      this.supabase.from('section_items').update({ order_rank: item.orderRank }).eq('id', item.id)
+    );
+    await Promise.all(updates);
+  }
+
   private mapToDomain(
     row: Database['public']['Tables']['sections']['Row'] & {
       inventory: Database['public']['Tables']['inventory']['Row'] | null;

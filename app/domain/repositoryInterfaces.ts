@@ -20,6 +20,8 @@ export interface IPortfolioRepository {
   upsertItem(item: SectionItem): Promise<SectionItem>;
   deleteItem(id: string): Promise<void>;
   deleteSection(id: string): Promise<void>;
+  updateSectionOrder(items: { id: string; orderRank: number }[]): Promise<void>;
+  updateItemOrder(items: { id: string; orderRank: number }[]): Promise<void>;
 }
 
 export interface INewsRepository {

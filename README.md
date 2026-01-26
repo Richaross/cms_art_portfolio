@@ -179,8 +179,8 @@ Based on the latest report, the following critical steps were identified and hav
 ### 6. Phase 2: Advanced CMS Features 🚧
 
 - **Portfolio Reordering (Drag & Drop)**:
-  - Manual sorting of Collections on the landing page.
-  - Manual sorting of Items within each Collection.
+  - ✅ **Jan 26**. Manual sorting of Collections on the landing page (with keyboard support).
+  - ✅ **Jan 26**. Drag-and-drop sorting of Items, including **Quick Sort** (Date/A-Z/Price).
 - **Enhanced Content Editor**:
   - ✅ **Jan 25**. Support for **Hyperlinks** and basic formatting in descriptions (Tiptap).
   - ✅ **Jan 25**. Draft vs. Published status for News and Portfolio items.

@@ -5,8 +5,24 @@ import { PortfolioSection, SectionItem } from '@/app/domain/types';
 import ImageUploader from './ImageUploader';
 import ItemEditor from './ItemEditor';
 import RichTextEditor from './RichTextEditor';
-import { saveSection, deleteSection } from '@/app/actions/portfolio';
-import { Plus, Edit2, GripVertical } from 'lucide-react'; // Assuming lucide-react is available
+import { saveSection, deleteSection, reorderItems } from '@/app/actions/portfolio';
+import { Plus, ArrowDownAZ, ArrowUpZA, CalendarArrowDown, CalendarArrowUp } from 'lucide-react';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  rectSortingStrategy,
+} from '@dnd-kit/sortable';
+import { SortableSectionItemCard } from './SortableSectionItemCard';
 
 interface SectionEditorProps {
   section: PortfolioSection | null;
@@ -29,6 +45,9 @@ export default function SectionEditor({ section, onSave, onCancel }: SectionEdit
   const [editingItem, setEditingItem] = useState<SectionItem | null>(null);
   const [isCreatingItem, setIsCreatingItem] = useState(false);
 
+  // Items State (for Optimistic DnD)
+  const [items, setItems] = useState<SectionItem[]>([]);
+
   // Initialize form when section prop changes
   useEffect(() => {
     if (section) {
@@ -37,14 +56,82 @@ export default function SectionEditor({ section, onSave, onCancel }: SectionEdit
       setImgUrl(section.imgUrl || '');
       setIsPublished(section.isPublished ?? true);
       setPublishedAt(section.publishedAt || null);
+      setItems(section.items || []);
     } else {
       setTitle('');
       setDescription('');
       setImgUrl('');
       setIsPublished(true);
       setPublishedAt(null);
+      setItems([]);
     }
   }, [section]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  async function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = items.findIndex((item) => item.id === active.id);
+      const newIndex = items.findIndex((item) => item.id === over.id);
+
+      const newOrder = arrayMove(items, oldIndex, newIndex);
+
+      // Optimistic Update
+      setItems(newOrder);
+
+      const updates = newOrder.map((item, index) => ({
+        id: item.id,
+        sectionId: section?.id || '', // Required by action signature
+        orderRank: index,
+      }));
+
+      reorderItems(updates).catch((err) => {
+        console.error('Reorder failed', err);
+        setItems(items); // Revert to original
+        alert('Failed to save order. Please refresh.');
+      });
+    }
+  }
+
+  const handleQuickSort = (
+    type: 'newest' | 'oldest' | 'az' | 'za' | 'price_high' | 'price_low'
+  ) => {
+    const sorted = [...items].sort((a, b) => {
+      switch (type) {
+        case 'newest':
+          return (b.publishedAt?.getTime() || 0) - (a.publishedAt?.getTime() || 0);
+        case 'oldest':
+          return (a.publishedAt?.getTime() || 0) - (b.publishedAt?.getTime() || 0);
+        case 'az':
+          return (a.title || '').localeCompare(b.title || '');
+        case 'za':
+          return (b.title || '').localeCompare(a.title || '');
+        case 'price_high':
+          return (b.price || 0) - (a.price || 0);
+        case 'price_low':
+          return (a.price || 0) - (b.price || 0);
+        default:
+          return 0;
+      }
+    });
+
+    setItems(sorted);
+
+    // Save
+    const updates = sorted.map((item, index) => ({
+      id: item.id,
+      sectionId: section?.id || '',
+      orderRank: index,
+    }));
+    reorderItems(updates).catch(console.error);
+  };
 
   const handleSaveSection = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,9 +148,6 @@ export default function SectionEditor({ section, onSave, onCancel }: SectionEdit
         ...(section?.id ? { id: section.id } : {}),
       };
 
-      // We don't pass inventory anymore here, as we are moving to Items.
-      // But to preserve backward compatibility if needed, we could pass null or existing.
-      // For now, let's just save the section metadata.
       const result = await saveSection(sectionData);
 
       if (!result.success) {
@@ -157,7 +241,7 @@ export default function SectionEditor({ section, onSave, onCancel }: SectionEdit
             onClick={() => setActiveTab('items')}
             className={`pb-2 px-2 text-sm font-medium ${activeTab === 'items' ? 'border-b-2 border-white text-white' : 'text-gray-400 hover:text-white'}`}
           >
-            Collection Items ({section.items?.length || 0})
+            Collection Items ({items.length})
           </button>
         </div>
       )}
@@ -187,6 +271,18 @@ export default function SectionEditor({ section, onSave, onCancel }: SectionEdit
             </div>
 
             <ImageUploader label="Cover Image" value={imgUrl} onChange={setImgUrl} />
+
+            <div className="flex flex-col gap-4 p-4 bg-black/30 rounded border border-white/5">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={isPublished}
+                  onChange={(e) => setIsPublished(e.target.checked)}
+                  className="rounded bg-black/50 border-white/10 text-white accent-white"
+                />
+                <span className="text-sm font-medium">Published on site</span>
+              </label>
+            </div>
           </div>
 
           <div className="flex items-center justify-between pt-4 border-t border-white/10">
@@ -211,81 +307,82 @@ export default function SectionEditor({ section, onSave, onCancel }: SectionEdit
       ) : (
         // Items Tab
         <div className="space-y-4">
-          <div className="flex justify-between items-center bg-black/30 p-4 rounded border border-white/5">
-            <p className="text-sm text-gray-400">
-              Manage individual artworks/products in this collection.
-            </p>
+          <div className="flex flex-wrap gap-2 justify-between items-center bg-black/30 p-4 rounded border border-white/5">
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-400 font-bold uppercase mr-2">Quick Sort:</span>
+              <button
+                onClick={() => handleQuickSort('newest')}
+                className="p-1.5 hover:bg-white/10 rounded"
+                title="Newest"
+              >
+                <CalendarArrowDown size={14} />
+              </button>
+              <button
+                onClick={() => handleQuickSort('oldest')}
+                className="p-1.5 hover:bg-white/10 rounded"
+                title="Oldest"
+              >
+                <CalendarArrowUp size={14} />
+              </button>
+              <button
+                onClick={() => handleQuickSort('az')}
+                className="p-1.5 hover:bg-white/10 rounded"
+                title="A-Z"
+              >
+                <ArrowDownAZ size={14} />
+              </button>
+              <button
+                onClick={() => handleQuickSort('za')}
+                className="p-1.5 hover:bg-white/10 rounded"
+                title="Z-A"
+              >
+                <ArrowUpZA size={14} />
+              </button>
+              <span className="text-xs text-gray-500 mx-1">|</span>
+              <button
+                onClick={() => handleQuickSort('price_high')}
+                className="p-1.5 hover:bg-white/10 rounded text-xs px-2 font-mono"
+                title="Price High-Low"
+              >
+                $$$
+              </button>
+              <button
+                onClick={() => handleQuickSort('price_low')}
+                className="p-1.5 hover:bg-white/10 rounded text-xs px-2 font-mono"
+                title="Price Low-High"
+              >
+                $
+              </button>
+            </div>
             <button
               onClick={handleCreateItem}
-              className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700"
+              className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 ml-auto"
             >
               <Plus size={16} /> Add Item
             </button>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {section?.items && section.items.length > 0 ? (
-              section.items.map((item) => (
-                <div
-                  key={item.id}
-                  className="relative group bg-black/50 rounded border border-white/5 hover:border-white/20 transition-all overflow-hidden flex flex-col"
-                >
-                  {/* Image Area */}
-                  <div className="aspect-square w-full bg-neutral-800 relative">
-                    {item.imageUrl ? (
-                      <>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={item.imageUrl}
-                          alt={item.title}
-                          className="w-full h-full object-cover"
-                        />
-                      </>
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-xs text-gray-500">
-                        No Image
-                      </div>
-                    )}
-
-                    {/* Overlay Actions */}
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                      <button
-                        onClick={() => handleEditItem(item)}
-                        className="p-2 bg-white rounded-full text-black hover:scale-110 transition-transform"
-                        title="Edit Item"
-                      >
-                        <Edit2 size={16} />
-                      </button>
-                    </div>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext items={items.map((i) => i.id)} strategy={rectSortingStrategy}>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {items.length > 0 ? (
+                  items.map((item) => (
+                    <SortableSectionItemCard key={item.id} item={item} onEdit={handleEditItem} />
+                  ))
+                ) : (
+                  <div className="col-span-full text-center py-12 text-gray-500 italic border-2 border-dashed border-white/10 rounded">
+                    <p>
+                      No items found in this collection. Click &quot;Add Item&quot; to get started.
+                    </p>
                   </div>
-
-                  {/* Content Area */}
-                  <div className="p-3 flex flex-col gap-1">
-                    <div className="font-medium text-sm truncate" title={item.title}>
-                      {item.title}
-                    </div>
-                    <div className="text-xs text-gray-400 flex justify-between items-center">
-                      {item.isSaleActive ? (
-                        <span className="text-green-400 font-mono">${item.price}</span>
-                      ) : (
-                        <span className="text-gray-600">Hidden</span>
-                      )}
-                      <span className="text-gray-600">Qty: {item.stockQty}</span>
-                    </div>
-                  </div>
-
-                  {/* Drag Handle */}
-                  <div className="absolute top-2 left-2 cursor-grab opacity-0 group-hover:opacity-100 bg-black/50 p-1 rounded">
-                    <GripVertical size={14} className="text-white/70" />
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="col-span-full text-center py-12 text-gray-500 italic border-2 border-dashed border-white/10 rounded">
-                <p>No items found in this collection. Click &quot;Add Item&quot; to get started.</p>
+                )}
               </div>
-            )}
-          </div>
+            </SortableContext>
+          </DndContext>
         </div>
       )}
     </div>

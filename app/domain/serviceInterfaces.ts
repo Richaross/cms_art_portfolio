@@ -19,7 +19,8 @@ export interface IPortfolioService {
   upsertInventory(inventory: InventoryItem): Promise<void>;
   upsertItem(item: SectionItem): Promise<SectionItem>;
   deleteItem(id: string): Promise<void>;
-  deleteSection(id: string): Promise<void>;
+  reorderSections(items: { id: string; orderRank: number }[]): Promise<void>;
+  reorderItems(items: { id: string; orderRank: number }[]): Promise<void>;
 }
 
 export interface INewsService {

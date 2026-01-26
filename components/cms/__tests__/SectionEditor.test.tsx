@@ -9,6 +9,7 @@ import { PortfolioSection } from '../../../app/domain/types';
 jest.mock('../../../app/actions/portfolio', () => ({
   saveSection: jest.fn(),
   deleteSection: jest.fn(),
+  reorderItems: jest.fn(),
 }));
 
 // Mock Child Components
@@ -193,8 +194,7 @@ describe('SectionEditor Component', () => {
 
     fireEvent.click(screen.getByText(/Collection Items/));
 
-    expect(
-      screen.getByText('Manage individual artworks/products in this collection.')
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Quick Sort:/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /add item/i })).toBeInTheDocument();
   });
 });
