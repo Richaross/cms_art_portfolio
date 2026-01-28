@@ -97,6 +97,13 @@ export default function DashboardPage() {
           })
         );
         setSections(mapped);
+
+        // If currently editing, update the editingSection object with fresh data
+        setEditingSection((prev) => {
+          if (!prev) return prev;
+          const updated = mapped.find((s) => s.id === prev.id);
+          return updated || prev;
+        });
       }
     }
 
@@ -180,8 +187,10 @@ export default function DashboardPage() {
               {editingSection !== undefined ? (
                 <SectionEditor
                   section={editingSection}
-                  onSave={() => {
-                    setEditingSection(undefined);
+                  onSave={(shouldClose = true) => {
+                    if (shouldClose) {
+                      setEditingSection(undefined);
+                    }
                     fetchData();
                   }}
                   onCancel={() => setEditingSection(undefined)}

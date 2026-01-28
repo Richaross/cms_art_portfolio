@@ -34,6 +34,14 @@ export class PortfolioService implements IPortfolioService {
     await this.repository.deleteSection(id);
   }
 
+  async deleteItems(ids: string[]): Promise<void> {
+    return this.repository.deleteItems(ids);
+  }
+
+  async updateItems(ids: string[], updates: Partial<SectionItem>): Promise<void> {
+    return this.repository.updateItems(ids, updates);
+  }
+
   async reorderSections(items: { id: string; orderRank: number }[]): Promise<void> {
     await this.repository.updateSectionOrder(items);
   }

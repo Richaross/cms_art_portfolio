@@ -111,6 +111,29 @@ export class PortfolioRepository implements IPortfolioRepository {
     if (error) throw error;
   }
 
+  async deleteItems(ids: string[]): Promise<void> {
+    const { error } = await this.supabase.from('section_items').delete().in('id', ids);
+    if (error) throw error;
+  }
+
+  async updateItems(ids: string[], updates: Partial<SectionItem>): Promise<void> {
+    const dbUpdates: Partial<Database['public']['Tables']['section_items']['Update']> = {};
+    if (updates.title !== undefined) dbUpdates.title = updates.title;
+    if (updates.description !== undefined) dbUpdates.description = updates.description;
+    if (updates.imageUrl !== undefined) dbUpdates.image_url = updates.imageUrl;
+    if (updates.price !== undefined) dbUpdates.price = updates.price;
+    if (updates.stockQty !== undefined) dbUpdates.stock_qty = updates.stockQty;
+    if (updates.stripeLink !== undefined) dbUpdates.stripe_link = updates.stripeLink;
+    if (updates.isSaleActive !== undefined) dbUpdates.is_sale_active = updates.isSaleActive;
+    if (updates.orderRank !== undefined) dbUpdates.order_rank = updates.orderRank;
+    if (updates.isPublished !== undefined) dbUpdates.is_published = updates.isPublished;
+    if (updates.publishedAt !== undefined)
+      dbUpdates.published_at = updates.publishedAt?.toISOString();
+
+    const { error } = await this.supabase.from('section_items').update(dbUpdates).in('id', ids);
+    if (error) throw error;
+  }
+
   async updateSectionOrder(items: { id: string; orderRank: number }[]): Promise<void> {
     const updates = items.map((item) =>
       this.supabase.from('sections').update({ order_rank: item.orderRank }).eq('id', item.id)

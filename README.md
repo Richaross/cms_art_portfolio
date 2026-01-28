@@ -54,6 +54,11 @@ _News - Modal_
 
 - **Service Layer Architecture**: Decoupled domain logic from Server Actions into dedicated services (`PortfolioService`, `NewsService`, `CloudinaryService`, `AboutService`, `HeroService`) for better testability and maintainability.
 - **Dynamic Content Management**: A dedicated Hero Section editor to customize the landing page experience without touching code.
+- **Bulk Item Operations**: Select and manage multiple portfolio items simultaneously:
+  - **Bulk Delete**: Remove multiple items with confirmation and automatic Cloudinary cleanup
+  - **Bulk Price Updates**: Update pricing for multiple items at once
+  - **Bulk Sale Status**: Toggle "On Sale" or "Hidden" status for selected items
+  - **Quick Sort**: Rapidly organize items by Date, Name (A-Z), or Price
 - **Strict Type Safety**: 100% type-safe codebase using generated Supabase types and domain-driven interfaces.
 - **Automated Image Cleanup**: Built-in hooks to ensure that deleting a record permanently removes the asset from Cloudinary.
 - **Integrated Monitoring**: Sentry integration for real-time error capture and UI error state logging.
@@ -72,6 +77,12 @@ The application uses a relational PostgreSQL schema (validated via `schema_v4_it
 ### 4. Quality Assurance & CI/CD
 
 - **Test-First Culture**: Strict adherence to TDD principles. Every feature is backed by failing unit tests before implementation.
+- **Comprehensive Test Coverage**: 62 passing tests across 14 test suites
+  - **Unit Tests**: Jest + React Testing Library for components and services
+  - **E2E Tests**: Playwright smoke tests for critical user flows
+  - **Modern Testing Practices**: Migrated to `@testing-library/user-event` for realistic user interactions
+  - **Bulk Actions Coverage**: Full test coverage for selection, delete, and update operations
+- **Optimized Pre-Commit Workflow**: Fast local validation (~29s) running lint, type-check, unit tests, and build
 - **CI Pipeline**: GitHub Actions running linting, type-checks, unit tests (Jest), and E2E smoke tests (Playwright) on every PR.
 - **Git Hooks**: Husky and `lint-staged` enforce code quality and formatting (Prettier) before every commit.
 
@@ -181,11 +192,20 @@ Based on the latest report, the following critical steps were identified and hav
 - **Portfolio Reordering (Drag & Drop)**:
   - ✅ **Jan 26**. Manual sorting of Collections on the landing page (with keyboard support).
   - ✅ **Jan 26**. Drag-and-drop sorting of Items, including **Quick Sort** (Date/A-Z/Price).
+- **Bulk Item Operations**:
+  - ✅ **Jan 28**. Multi-select functionality for portfolio items.
+  - ✅ **Jan 28**. Bulk delete with confirmation and Cloudinary cleanup.
+  - ✅ **Jan 28**. Bulk price updates and sale status toggling.
 - **Enhanced Content Editor**:
   - ✅ **Jan 25**. Support for **Hyperlinks** and basic formatting in descriptions (Tiptap).
   - ✅ **Jan 25**. Draft vs. Published status for News and Portfolio items.
   - ✅ **Jan 25**. Scheduled posting for News content.
-- **Media Library & Asset Management**:
+- **Test Infrastructure Modernization**:
+  - ✅ **Jan 28**. Migrated to `@testing-library/user-event` for better test reliability.
+  - ✅ **Jan 28**. Comprehensive test coverage for Bulk Actions (62 passing tests).
+  - ✅ **Jan 28**. E2E test refactoring with Playwright best practices.
+  - ✅ **Jan 28**. Optimized pre-commit workflow (removed E2E, ~29s execution).
+- **Media Library & Asset Management** 🚧:
   - Centralized image library with asset reuse (e.g., use item image as collection cover).
   - Integrated **Image Cropping** and Alt-Text management for SEO.
 - **Artist Analytics (TBD)**:

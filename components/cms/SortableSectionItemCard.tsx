@@ -8,9 +8,16 @@ import { SectionItem } from '@/app/domain/types';
 interface SortableSectionItemCardProps {
   item: SectionItem;
   onEdit: (item: SectionItem) => void;
+  selected?: boolean;
+  onSelect?: () => void;
 }
 
-export function SortableSectionItemCard({ item, onEdit }: SortableSectionItemCardProps) {
+export function SortableSectionItemCard({
+  item,
+  onEdit,
+  selected,
+  onSelect,
+}: SortableSectionItemCardProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.id,
   });
@@ -26,10 +33,29 @@ export function SortableSectionItemCard({ item, onEdit }: SortableSectionItemCar
     <div
       ref={setNodeRef}
       style={style}
-      className={`relative group bg-black/50 rounded border border-white/5 transition-all overflow-hidden flex flex-col ${
-        isDragging ? 'border-blue-500 shadow-lg' : 'hover:border-white/20'
-      }`}
+      className={`relative group bg-black/50 rounded border transition-all overflow-hidden flex flex-col ${
+        selected ? 'border-blue-500 ring-1 ring-blue-500 bg-blue-900/10' : 'border-white/5'
+      } ${isDragging ? 'border-blue-500 shadow-lg' : 'hover:border-white/20'}`}
     >
+      {/* Selection Checkbox */}
+      {onSelect && (
+        <div
+          className={`absolute top-2 right-2 z-30 transition-opacity ${
+            selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+          }`}
+        >
+          <input
+            type="checkbox"
+            checked={!!selected}
+            onChange={(e) => {
+              e.stopPropagation();
+              onSelect();
+            }}
+            className="w-4 h-4 cursor-pointer accent-blue-500"
+          />
+        </div>
+      )}
+
       {/* Image Area */}
       <div className="aspect-square w-full bg-neutral-800 relative">
         {item.imageUrl ? (

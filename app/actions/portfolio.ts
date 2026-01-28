@@ -167,7 +167,46 @@ export async function reorderItems(
     revalidatePath('/');
     return { success: true };
   } catch (error: unknown) {
-    console.error('Failed to reorder items:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+  }
+}
+
+export async function deleteSectionItemsAction(
+  items: { id: string; imgUrl?: string | null }[]
+): Promise<{ success: boolean; error?: string }> {
+  const service = await getPortfolioService();
+  try {
+    // Delete images in parallel
+    const imageDeletions = items
+      .filter((item) => item.imgUrl)
+      .map((item) => CloudinaryService.deleteImageByUrl(item.imgUrl!));
+
+    // We wait for images to delete but don't block if some fail (best effort)
+    await Promise.allSettled(imageDeletions);
+
+    await service.deleteItems(items.map((i) => i.id));
+
+    revalidatePath('/dashboard');
+    revalidatePath('/');
+    return { success: true };
+  } catch (error: unknown) {
+    console.error('Failed to delete items:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+  }
+}
+
+export async function updateSectionItemsAction(
+  ids: string[],
+  updates: Partial<SectionItem>
+): Promise<{ success: boolean; error?: string }> {
+  const service = await getPortfolioService();
+  try {
+    await service.updateItems(ids, updates);
+    revalidatePath('/dashboard');
+    revalidatePath('/');
+    return { success: true };
+  } catch (error: unknown) {
+    console.error('Failed to update items:', error);
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }
