@@ -206,7 +206,9 @@ Based on the latest report, the following critical steps were identified and hav
   - ✅ **Jan 28**. E2E test refactoring with Playwright best practices.
   - ✅ **Jan 28**. Optimized pre-commit workflow (removed E2E, ~29s execution).
 - **Media Library & Asset Management** 🚧:
-  - Centralized image library with asset reuse (e.g., use item image as collection cover).
-  - Integrated **Image Cropping** and Alt-Text management for SEO.
+  - **Centralized Library**: Reusable assets with tagging and advanced search.
+  - **Smart Covers**: Logic to auto-assign "In Progress" placeholders or select covers from collection items.
+  - **Advanced Imaging**: In-CMS image cropping with live preview (`react-easy-crop`).
+  - **Contextual SEO**: Global Alt-Text defaults with support for per-context overrides.
 - **Artist Analytics (TBD)**:
   - Dashboard for tracking artwork views and site engagement.
