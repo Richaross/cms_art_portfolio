@@ -8,6 +8,8 @@ import RichTextEditor from './RichTextEditor';
 
 import { getNewsPosts, saveNewsPost, deleteNewsPost } from '@/app/actions/news';
 import { NewsPost } from '@/app/domain/types';
+import toast from 'react-hot-toast';
+import ConfirmDialog from './ConfirmDialog';
 
 export default function NewsEditor() {
   const [posts, setPosts] = useState<NewsPost[]>([]);
@@ -103,6 +105,7 @@ function NewsPostForm({
   const [externalLink, setExternalLink] = useState(post?.externalLink || '');
   const [isPublished, setIsPublished] = useState(post?.isPublished ?? true);
   const [loading, setLoading] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -124,20 +127,20 @@ function NewsPostForm({
 
     setLoading(false);
     if (!result.success) {
-      alert('Error saving post: ' + result.error);
+      toast.error(result.error || 'Failed to save post.');
     } else {
       onSave();
     }
   };
 
   const handleDelete = async () => {
-    if (!post?.id || !confirm('Delete this post?')) return;
+    if (!post?.id) return;
     setLoading(true);
 
     const result = await deleteNewsPost(post.id, post.imageUrl);
 
     if (!result.success) {
-      alert('Error deleting post: ' + result.error);
+      toast.error(result.error || 'Failed to delete post.');
       setLoading(false);
     } else {
       onSave();
@@ -221,11 +224,23 @@ function NewsPostForm({
           {post?.id && (
             <button
               type="button"
-              onClick={handleDelete}
+              onClick={() => setShowDeleteConfirm(true)}
               className="text-red-500 text-sm hover:underline flex items-center gap-1"
             >
               <Trash2 size={14} /> Delete
             </button>
+          )}
+          {showDeleteConfirm && (
+            <ConfirmDialog
+              message="Are you sure you want to delete this post? This cannot be undone."
+              confirmLabel="Delete"
+              destructive
+              onConfirm={() => {
+                setShowDeleteConfirm(false);
+                handleDelete();
+              }}
+              onCancel={() => setShowDeleteConfirm(false)}
+            />
           )}
           <button
             type="submit"

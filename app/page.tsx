@@ -27,9 +27,9 @@ async function getHeroSettings() {
 export default async function Home() {
   const [heroSettings, aboutData, portfolioSections, newsPosts] = await Promise.all([
     getHeroSettings(),
-    getAboutInfo(),
-    getPortfolioSections(),
-    getNewsPosts(),
+    getAboutInfo().catch(() => null),
+    getPortfolioSections().catch(() => []),
+    getNewsPosts().catch(() => []),
   ]);
 
   return (

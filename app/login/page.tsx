@@ -26,7 +26,7 @@ export default function LoginPage() {
     });
 
     if (error) {
-      setError(error.message);
+      setError('Invalid email or password.');
       setLoading(false);
     } else {
       router.push('/dashboard');
@@ -54,9 +54,14 @@ export default function LoginPage() {
         <form className="mt-8 space-y-6" onSubmit={handleLogin}>
           <div className="space-y-4">
             <div>
+              <label htmlFor="email" className="sr-only">
+                Email address
+              </label>
               <input
+                id="email"
                 type="email"
                 required
+                autoComplete="email"
                 className="w-full rounded-md border border-white/10 bg-black/50 px-3 py-2 text-white placeholder-gray-500 focus:border-white focus:outline-none focus:ring-1 focus:ring-white sm:text-sm"
                 placeholder="Email address"
                 value={email}
@@ -64,9 +69,14 @@ export default function LoginPage() {
               />
             </div>
             <div>
+              <label htmlFor="password" className="sr-only">
+                Password
+              </label>
               <input
+                id="password"
                 type="password"
                 required
+                autoComplete="current-password"
                 className="w-full rounded-md border border-white/10 bg-black/50 px-3 py-2 text-white placeholder-gray-500 focus:border-white focus:outline-none focus:ring-1 focus:ring-white sm:text-sm"
                 placeholder="Password"
                 value={password}

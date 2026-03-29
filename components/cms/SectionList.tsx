@@ -27,7 +27,11 @@ interface SectionListProps {
   onRefresh: () => void;
 }
 
-export default function SectionList({ sections: initialSections, onEdit }: SectionListProps) {
+export default function SectionList({
+  sections: initialSections,
+  onEdit,
+  onRefresh,
+}: SectionListProps) {
   const [items, setItems] = useState<PortfolioSection[]>(initialSections);
 
   useEffect(() => {
@@ -61,9 +65,7 @@ export default function SectionList({ sections: initialSections, onEdit }: Secti
       // Fire and forget (or handle error via toast)
       reorderSections(updates).catch((err) => {
         console.error('Reorder failed', err);
-        // Revert would go here if we wanted robust error handling
-        setItems(items); // Revert to original items
-        alert('Failed to save order. Please refresh.');
+        onRefresh(); // Pull authoritative order from server
       });
     }
   }
@@ -96,7 +98,10 @@ export default function SectionList({ sections: initialSections, onEdit }: Secti
       id: item.id,
       orderRank: index,
     }));
-    reorderSections(updates).catch(console.error);
+    reorderSections(updates).catch((err) => {
+      console.error('Quick sort save failed', err);
+      onRefresh();
+    });
   };
 
   if (items.length === 0) {

@@ -6,6 +6,15 @@ import { NewsRepository } from '@/app/lib/repositories/newsRepository';
 import { CloudinaryService } from '@/app/lib/services/cloudinaryService';
 import { NewsPost } from '@/app/domain/types';
 import { revalidatePath } from 'next/cache';
+import { z } from 'zod';
+
+async function requireAuth() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error('Unauthorized');
+}
 
 async function getNewsService() {
   const supabase = await createClient();
@@ -13,19 +22,37 @@ async function getNewsService() {
   return new NewsService(repository);
 }
 
+const newsPostSchema = z.object({
+  id: z.string().optional(),
+  title: z.string().min(1).max(300),
+  summary: z.string().max(1000).nullable().optional(),
+  category: z.string().min(1).max(100),
+  content: z.string().max(50000).nullable().optional(),
+  imageUrl: z.string().nullable().optional(),
+  externalLink: z.string().nullable().optional(),
+  isPublished: z.boolean().optional(),
+  publishedAt: z.date().nullable().optional(),
+});
+
+// --- Read Actions (public) ---
+
 export async function getNewsPosts(): Promise<NewsPost[]> {
   const service = await getNewsService();
   return service.getAll();
 }
 
+// --- Mutating Actions (require auth) ---
+
 export async function saveNewsPost(
   post: Partial<NewsPost>
 ): Promise<{ success: boolean; error?: string }> {
-  const service = await getNewsService();
   try {
-    await service.upsert(post);
+    await requireAuth();
+    const parsed = newsPostSchema.parse(post);
+    const service = await getNewsService();
+    await service.upsert(parsed);
     revalidatePath('/dashboard');
-    revalidatePath('/'); // Revalidate main page/news section
+    revalidatePath('/');
     return { success: true };
   } catch (error: unknown) {
     console.error('Failed to save news post:', error);
@@ -37,15 +64,15 @@ export async function deleteNewsPost(
   id: string,
   imageUrl?: string | null
 ): Promise<{ success: boolean; error?: string }> {
-  const service = await getNewsService();
   try {
-    // 1. Delete image from Cloudinary if needed
+    await requireAuth();
+    const validId = z.string().min(1).parse(id);
+    const service = await getNewsService();
+
     if (imageUrl) {
       await CloudinaryService.deleteImageByUrl(imageUrl);
     }
-
-    // 2. Delete from DB
-    await service.delete(id);
+    await service.delete(validId);
 
     revalidatePath('/dashboard');
     revalidatePath('/');

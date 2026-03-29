@@ -40,6 +40,8 @@ import {
   rectSortingStrategy,
 } from '@dnd-kit/sortable';
 import { SortableSectionItemCard } from './SortableSectionItemCard';
+import toast from 'react-hot-toast';
+import ConfirmDialog from './ConfirmDialog';
 
 interface SectionEditorProps {
   section: PortfolioSection | null;
@@ -70,6 +72,8 @@ export default function SectionEditor({ section, onSave, onCancel }: SectionEdit
   const [showBulkPriceDialog, setShowBulkPriceDialog] = useState(false);
   const [bulkPrice, setBulkPrice] = useState<string>('');
   const [bulkSaleStatus, setBulkSaleStatus] = useState<'keep' | 'active' | 'inactive'>('keep');
+  const [showDeleteSectionConfirm, setShowDeleteSectionConfirm] = useState(false);
+  const [showBulkDeleteConfirm, setShowBulkDeleteConfirm] = useState(false);
 
   // Initialize form when section prop changes
   useEffect(() => {
@@ -118,7 +122,7 @@ export default function SectionEditor({ section, onSave, onCancel }: SectionEdit
       reorderItems(updates).catch((err) => {
         console.error('Reorder failed', err);
         setItems(items); // Revert to original
-        alert('Failed to save order. Please refresh.');
+        toast.error('Failed to save order. Please refresh.');
       });
     }
   }
@@ -174,33 +178,29 @@ export default function SectionEditor({ section, onSave, onCancel }: SectionEdit
       const result = await saveSection(sectionData);
 
       if (!result.success) {
-        alert('Error saving collection: ' + result.error);
+        toast.error(result.error || 'Failed to save collection.');
       } else {
-        onSave(true); // Close on main save
+        onSave(true);
       }
     } catch (error) {
       console.error('Error saving:', error);
-      alert('Error saving collection');
+      toast.error('Failed to save collection.');
     } finally {
       setLoading(false);
     }
   };
 
   const handleDeleteSection = async () => {
-    if (
-      !section?.id ||
-      !confirm('Are you sure you want to delete this entire collection and all its items?')
-    )
-      return;
+    if (!section?.id) return;
     setLoading(true);
 
     const result = await deleteSection(section.id, section.imgUrl);
 
     if (!result.success) {
-      alert('Error deleting collection: ' + result.error);
+      toast.error(result.error || 'Failed to delete collection.');
       setLoading(false);
     } else {
-      onSave(true); // Close on delete
+      onSave(true);
     }
   };
 
@@ -225,13 +225,6 @@ export default function SectionEditor({ section, onSave, onCancel }: SectionEdit
   };
 
   const handleBulkDelete = async () => {
-    if (
-      !confirm(
-        `Are you sure you want to delete ${selectedItemIds.size} items? This cannot be undone.`
-      )
-    )
-      return;
-
     setLoading(true);
     const itemsToDelete = items
       .filter((i) => selectedItemIds.has(i.id))
@@ -247,7 +240,7 @@ export default function SectionEditor({ section, onSave, onCancel }: SectionEdit
       // Also trigger full refresh to be safe, but DON'T CLOSE
       onSave(false);
     } else {
-      alert('Bulk delete failed: ' + result.error);
+      toast.error(result.error || 'Bulk delete failed.');
     }
     setLoading(false);
   };
@@ -275,7 +268,7 @@ export default function SectionEditor({ section, onSave, onCancel }: SectionEdit
       setSelectedItemIds(new Set());
       onSave(false); // Refresh but DON'T CLOSE
     } else {
-      alert('Bulk update failed: ' + result.error);
+      toast.error(result.error || 'Bulk update failed.');
     }
     setLoading(false);
   };
@@ -384,11 +377,23 @@ export default function SectionEditor({ section, onSave, onCancel }: SectionEdit
             </div>
           </div>
 
+          {showDeleteSectionConfirm && (
+            <ConfirmDialog
+              message="Are you sure you want to delete this entire collection and all its items? This cannot be undone."
+              confirmLabel="Delete Collection"
+              destructive
+              onConfirm={() => {
+                setShowDeleteSectionConfirm(false);
+                handleDeleteSection();
+              }}
+              onCancel={() => setShowDeleteSectionConfirm(false)}
+            />
+          )}
           <div className="flex items-center justify-between pt-4 border-t border-white/10">
             {section?.id && (
               <button
                 type="button"
-                onClick={handleDeleteSection}
+                onClick={() => setShowDeleteSectionConfirm(true)}
                 className="text-red-500 text-sm hover:underline"
               >
                 Delete Collection
@@ -435,11 +440,23 @@ export default function SectionEditor({ section, onSave, onCancel }: SectionEdit
                   <DollarSign size={14} /> Update
                 </button>
                 <button
-                  onClick={handleBulkDelete}
+                  onClick={() => setShowBulkDeleteConfirm(true)}
                   className="flex items-center gap-2 bg-red-700 text-white px-3 py-1.5 rounded text-sm hover:bg-red-600"
                 >
                   <Trash2 size={14} /> Delete
                 </button>
+                {showBulkDeleteConfirm && (
+                  <ConfirmDialog
+                    message={`Are you sure you want to delete ${selectedItemIds.size} items? This cannot be undone.`}
+                    confirmLabel="Delete Items"
+                    destructive
+                    onConfirm={() => {
+                      setShowBulkDeleteConfirm(false);
+                      handleBulkDelete();
+                    }}
+                    onCancel={() => setShowBulkDeleteConfirm(false)}
+                  />
+                )}
                 <button
                   onClick={() => setSelectedItemIds(new Set())}
                   className="p-1.5 hover:bg-white/10 rounded text-gray-400 hover:text-white"

@@ -7,6 +7,7 @@ import { HeroRepository } from '@/app/lib/repositories/heroRepository';
 import { HeroSettings } from '@/app/domain/types';
 import ImageUploader from './ImageUploader';
 import { Facebook, Instagram, Linkedin, MessageCircle, X, Loader2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function HeroEditor() {
   const [settings, setSettings] = useState<HeroSettings | null>(null);
@@ -37,10 +38,10 @@ export default function HeroEditor() {
       const repository = new HeroRepository(supabase);
       const service = new HeroService(repository);
       await service.updateSettings(settings);
-      alert('Hero settings saved successfully!');
+      toast.success('Hero settings saved!');
     } catch (error) {
       console.error('Error saving hero settings:', error);
-      alert('Failed to save hero settings.');
+      toast.error('Failed to save hero settings.');
     } finally {
       setSaving(false);
     }

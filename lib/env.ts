@@ -28,8 +28,8 @@ const envSchema = z.object({
   // Cloudinary
   NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: withCiFallback(z.string().min(1), 'placeholder'),
   NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET: withCiFallback(z.string().min(1), 'placeholder'),
-  NEXT_PUBLIC_CLOUDINARY_API_KEY: withCiFallback(z.string().min(1), 'placeholder'),
-  NEXT_PUBLIC_CLOUDINARY_API_SECRET: withCiFallback(z.string().min(1), 'placeholder'),
+  CLOUDINARY_API_KEY: withCiFallback(z.string().min(1), 'placeholder'),
+  CLOUDINARY_API_SECRET: withCiFallback(z.string().min(1), 'placeholder'),
 
   // Sentry
   NEXT_PUBLIC_SENTRY_DSN: z.preprocess(

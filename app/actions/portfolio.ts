@@ -6,6 +6,15 @@ import { PortfolioRepository } from '@/app/lib/repositories/portfolioRepository'
 import { CloudinaryService } from '@/app/lib/services/cloudinaryService';
 import { PortfolioSection, InventoryItem, SectionItem } from '@/app/domain/types';
 import { revalidatePath } from 'next/cache';
+import { z } from 'zod';
+
+async function requireAuth() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error('Unauthorized');
+}
 
 async function getPortfolioService() {
   const supabase = await createClient();
@@ -13,24 +22,67 @@ async function getPortfolioService() {
   return new PortfolioService(repository);
 }
 
+// --- Validation Schemas ---
+
+const sectionSchema = z.object({
+  id: z.string().optional(),
+  title: z.string().min(1).max(200).optional(),
+  description: z.string().max(5000).nullable().optional(),
+  imgUrl: z.string().nullable().optional(),
+  orderRank: z.number().int().min(0).optional(),
+  isPublished: z.boolean().optional(),
+  publishedAt: z.date().nullable().optional(),
+});
+
+const inventorySchema = z.object({
+  sectionId: z.string().min(1),
+  stockQty: z.number().int().min(0),
+  price: z.number().min(0).nullable(),
+  stripeLink: z.string().nullable().optional(),
+  isSaleActive: z.boolean(),
+});
+
+const itemSchema = z.object({
+  id: z.string(),
+  sectionId: z.string().min(1),
+  title: z.string().min(1).max(200),
+  description: z.string().max(5000).nullable(),
+  imageUrl: z.string().nullable(),
+  price: z.number().min(0),
+  stockQty: z.number().int().min(0),
+  stripeLink: z.string().nullable(),
+  isSaleActive: z.boolean(),
+  orderRank: z.number().int().min(0),
+  isPublished: z.boolean(),
+  publishedAt: z.date().nullable(),
+});
+
+const reorderSchema = z
+  .array(z.object({ id: z.string().min(1), orderRank: z.number().int().min(0) }))
+  .min(1);
+
+// --- Read Actions (public) ---
+
 export async function getPortfolioSections(): Promise<PortfolioSection[]> {
   const service = await getPortfolioService();
   return service.getAll();
 }
 
+// --- Mutating Actions (require auth) ---
+
 export async function saveSection(
   section: Partial<PortfolioSection>,
   inventory?: InventoryItem
 ): Promise<{ success: boolean; error?: string }> {
-  const service = await getPortfolioService();
   try {
-    const savedSection = await service.upsertSection(section);
+    await requireAuth();
+    const parsed = sectionSchema.parse(section);
+    const service = await getPortfolioService();
+    const savedSection = await service.upsertSection(parsed);
 
     if (inventory && savedSection.id) {
-      await service.upsertInventory({
-        ...inventory,
-        sectionId: savedSection.id,
-      });
+      const parsedInventory = inventorySchema.parse({ ...inventory, sectionId: savedSection.id });
+      await service.upsertInventory(parsedInventory);
     }
 
     revalidatePath('/dashboard');
@@ -46,12 +98,14 @@ export async function deleteSection(
   id: string,
   imgUrl?: string | null
 ): Promise<{ success: boolean; error?: string }> {
-  const service = await getPortfolioService();
   try {
+    await requireAuth();
+    const validId = z.string().min(1).parse(id);
+    const service = await getPortfolioService();
     if (imgUrl) {
       await CloudinaryService.deleteImageByUrl(imgUrl);
     }
-    await service.deleteSection(id);
+    await service.deleteSection(validId);
 
     revalidatePath('/dashboard');
     revalidatePath('/');
@@ -62,12 +116,12 @@ export async function deleteSection(
   }
 }
 
-// --- Item Actions ---
-
 export async function saveItem(item: SectionItem): Promise<{ success: boolean; error?: string }> {
-  const service = await getPortfolioService();
   try {
-    await service.upsertItem(item);
+    await requireAuth();
+    const parsed = itemSchema.parse(item);
+    const service = await getPortfolioService();
+    await service.upsertItem(parsed);
     revalidatePath('/dashboard');
     revalidatePath('/');
     return { success: true };
@@ -81,12 +135,14 @@ export async function deleteItem(
   id: string,
   imgUrl?: string | null
 ): Promise<{ success: boolean; error?: string }> {
-  const service = await getPortfolioService();
   try {
+    await requireAuth();
+    const validId = z.string().min(1).parse(id);
+    const service = await getPortfolioService();
     if (imgUrl) {
       await CloudinaryService.deleteImageByUrl(imgUrl);
     }
-    await service.deleteItem(id);
+    await service.deleteItem(validId);
 
     revalidatePath('/dashboard');
     revalidatePath('/');
@@ -100,18 +156,11 @@ export async function deleteItem(
 export async function reorderSections(
   items: { id: string; orderRank: number }[]
 ): Promise<{ success: boolean; error?: string }> {
-  // Service layer not implemented for batch update, using repository or direct
-  // For now, let's just iterate (or we could expose a batch method in service later)
-  const service = await getPortfolioService();
   try {
-    // In a real app we might want a transaction. Supabase doesn't support complex
-    // transactions over REST easily without RPC. We'll iterate for now.
-    // Ideally: await service.updateSectionOrder(items);
-
-    // Let's assume we add this method to service or just loop here.
-    // Since we want this to be atomic-ish and fast, we'll try to execute parallel promises.
-    const updates = items.map((item) => service.upsertSection(item));
-    await Promise.all(updates);
+    await requireAuth();
+    const parsed = reorderSchema.parse(items);
+    const service = await getPortfolioService();
+    await service.reorderSections(parsed);
 
     revalidatePath('/dashboard');
     revalidatePath('/');
@@ -125,48 +174,27 @@ export async function reorderSections(
 export async function reorderItems(
   items: { id: string; sectionId: string; orderRank: number }[]
 ): Promise<{ success: boolean; error?: string }> {
-  const service = await getPortfolioService();
   try {
-    // Similar approach for items
-    // Note: upsertItem requires full item if we don't handle partials well in repository
-    // Let's verify if upsertItem handles partials. The types say SectionItem which is full.
-    // We might need a partial update method in repository.
-    // For now, let's cheat and cast, but we should fix correct method in Service.
+    await requireAuth();
+    const parsed = z
+      .array(
+        z.object({
+          id: z.string().min(1),
+          sectionId: z.string().min(1),
+          orderRank: z.number().int().min(0),
+        })
+      )
+      .min(1)
+      .parse(items);
 
-    // Actually, let's fix the service to accept partials or add specific method.
-    // Since we can't easily change service right now without reading it,
-    // let's assume we need to fetch or specific update.
-
-    // WAIT: upsertItem takes SectionItem.
-    // Let's implement a specific reorder method in Service to be clean.
-    // For this file, I'll call it `updateItemOrder` if it existed.
-    // Since it doesn't, let's modify the plan to add it to Service first.
-    // But to respect the "edit this file" instruction, I'll put the logic here via raw supabase or helper
-    // Actually, calling upsert with just ID and rank might wipe other fields if not careful.
-    // So safest is to fetch-merge-save or add a patch method.
-
-    // Better approach: Let's assume we will add `updateBatchOrder` to the Service.
-    // I will write the code calling it, and then go fix the Service.
-    // await service.reorderItems(items);
-
-    // For the sake of progress in THIS file, I will implement a loop that just patches via supabase directly
-    // to avoid the service overhead of a full fetch-update loop for just ranking.
-    // But that breaks layering.
-
-    // Correct path: Use service.
-    // I'll call a new method `reorderItems` on service, and `reorderSections` on service.
-    // Then I will go implement them.
-
-    await service.reorderSections(items); // Need to implement this
-    // For items, we need sectionId simply because my interface might ask for it,
-    // but globally unique IDs don't strictly need it.
-    // But let's pass it.
-    await service.reorderItems(items);
+    const service = await getPortfolioService();
+    await service.reorderItems(parsed);
 
     revalidatePath('/dashboard');
     revalidatePath('/');
     return { success: true };
   } catch (error: unknown) {
+    console.error('Failed to reorder items:', error);
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }
@@ -174,17 +202,21 @@ export async function reorderItems(
 export async function deleteSectionItemsAction(
   items: { id: string; imgUrl?: string | null }[]
 ): Promise<{ success: boolean; error?: string }> {
-  const service = await getPortfolioService();
   try {
-    // Delete images in parallel
-    const imageDeletions = items
+    await requireAuth();
+    const parsed = z
+      .array(z.object({ id: z.string().min(1), imgUrl: z.string().nullable().optional() }))
+      .min(1)
+      .parse(items);
+
+    const service = await getPortfolioService();
+
+    const imageDeletions = parsed
       .filter((item) => item.imgUrl)
       .map((item) => CloudinaryService.deleteImageByUrl(item.imgUrl!));
-
-    // We wait for images to delete but don't block if some fail (best effort)
     await Promise.allSettled(imageDeletions);
 
-    await service.deleteItems(items.map((i) => i.id));
+    await service.deleteItems(parsed.map((i) => i.id));
 
     revalidatePath('/dashboard');
     revalidatePath('/');
@@ -199,9 +231,13 @@ export async function updateSectionItemsAction(
   ids: string[],
   updates: Partial<SectionItem>
 ): Promise<{ success: boolean; error?: string }> {
-  const service = await getPortfolioService();
   try {
-    await service.updateItems(ids, updates);
+    await requireAuth();
+    const validIds = z.array(z.string().min(1)).min(1).parse(ids);
+    const validUpdates = itemSchema.partial().parse(updates);
+
+    const service = await getPortfolioService();
+    await service.updateItems(validIds, validUpdates);
     revalidatePath('/dashboard');
     revalidatePath('/');
     return { success: true };

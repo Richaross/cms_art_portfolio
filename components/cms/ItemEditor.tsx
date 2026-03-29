@@ -5,6 +5,8 @@ import { SectionItem } from '@/app/domain/types';
 import ImageUploader from './ImageUploader';
 import RichTextEditor from './RichTextEditor';
 import { saveItem, deleteItem } from '@/app/actions/portfolio';
+import toast from 'react-hot-toast';
+import ConfirmDialog from './ConfirmDialog';
 
 interface ItemEditorProps {
   item: SectionItem | null;
@@ -15,6 +17,7 @@ interface ItemEditorProps {
 
 export default function ItemEditor({ item, sectionId, onSave, onCancel }: ItemEditorProps) {
   const [loading, setLoading] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // Form State
   const [title, setTitle] = useState('');
@@ -74,26 +77,26 @@ export default function ItemEditor({ item, sectionId, onSave, onCancel }: ItemEd
       const result = await saveItem(itemData);
 
       if (!result.success) {
-        alert('Error saving item: ' + result.error);
+        toast.error(result.error || 'Failed to save item.');
       } else {
         onSave();
       }
     } catch (error) {
       console.error('Error saving item:', error);
-      alert('Error saving item');
+      toast.error('Failed to save item.');
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async () => {
-    if (!item?.id || !confirm('Are you sure you want to delete this item?')) return;
+    if (!item?.id) return;
     setLoading(true);
 
     const result = await deleteItem(item.id, item.imageUrl);
 
     if (!result.success) {
-      alert('Error deleting item: ' + result.error);
+      toast.error(result.error || 'Failed to delete item.');
       setLoading(false);
     } else {
       onSave();
@@ -175,11 +178,23 @@ export default function ItemEditor({ item, sectionId, onSave, onCancel }: ItemEd
             {item?.id && (
               <button
                 type="button"
-                onClick={handleDelete}
+                onClick={() => setShowDeleteConfirm(true)}
                 className="text-red-500 text-sm hover:underline"
               >
                 Delete
               </button>
+            )}
+            {showDeleteConfirm && (
+              <ConfirmDialog
+                message="Are you sure you want to delete this item? This cannot be undone."
+                confirmLabel="Delete"
+                destructive
+                onConfirm={() => {
+                  setShowDeleteConfirm(false);
+                  handleDelete();
+                }}
+                onCancel={() => setShowDeleteConfirm(false)}
+              />
             )}
           </div>
           <div className="flex gap-2">

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Upload, X, Loader2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface ImageUploaderProps {
   value: string;
@@ -18,10 +19,8 @@ export default function ImageUploader({ value, onChange, label = 'Image' }: Imag
 
     // Check for macOS metadata files (AppleDouble)
     if (file.name.startsWith('._')) {
-      alert(
-        `Invalid file: "${file.name}" appears to be a macOS metadata file and cannot be uploaded. Please select the actual image file.`
-      );
-      e.target.value = ''; // Reset input
+      toast.error('That file appears to be a macOS metadata file. Please select the actual image.');
+      e.target.value = '';
       return;
     }
 
@@ -54,7 +53,7 @@ export default function ImageUploader({ value, onChange, label = 'Image' }: Imag
     } catch (error: unknown) {
       const err = error as Error;
       console.error('Upload failed:', err);
-      alert(err.message || 'Upload failed. Check console for details.');
+      toast.error(err.message || 'Upload failed.');
     } finally {
       setUploading(false);
     }

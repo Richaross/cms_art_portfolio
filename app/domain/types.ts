@@ -22,7 +22,7 @@ export interface PortfolioSection {
   publishedAt: Date | null;
   // Relations
   items?: SectionItem[];
-  inventory?: InventoryItem | null; // Keeping for backward compat logic if needed, but moving towards items
+  inventory?: InventoryItem | null;
 }
 
 export interface SectionItem {

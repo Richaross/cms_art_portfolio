@@ -5,6 +5,7 @@ import RichTextEditor from './RichTextEditor';
 import ImageUploader from './ImageUploader';
 import { getAboutInfo, saveAboutInfo } from '@/app/actions/about';
 import { format } from 'date-fns';
+import toast from 'react-hot-toast';
 
 export default function AboutEditor() {
   const [description, setDescription] = useState('');
@@ -40,9 +41,9 @@ export default function AboutEditor() {
 
     setLoading(false);
     if (!result.success) {
-      alert('Error updating About info: ' + result.error);
+      toast.error(result.error || 'Failed to update About info.');
     } else {
-      alert('About info updated!');
+      toast.success('About info updated!');
     }
   };
 
